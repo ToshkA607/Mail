@@ -117,7 +117,8 @@ function submitRequest(e) {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
     btn.disabled = true;
     
-    fetch('https://formspree.io/f/mkgdvkke', {
+    // ЗДЕСЬ ЗАМЕНИТЕ ССЫЛКУ
+    fetch('https://formspree.io/f/xjyvvgbp', {
         method: 'POST',
         body: formData,
         headers: {
@@ -4070,13 +4071,13 @@ function submitFeedback(e) {
     const form = document.getElementById('feedbackForm');
     const formData = new FormData(form);
     
-    // Показываем индикатор загрузки
     const btn = form.querySelector('button[type="submit"]');
     const originalText = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
     btn.disabled = true;
     
-    fetch('https://formspree.io/f/mkgdvkke', {
+    // ЗДЕСЬ ЗАМЕНИТЕ ССЫЛКУ
+    fetch('https://formspree.io/f/xjyvvgbp', {
         method: 'POST',
         body: formData,
         headers: {
