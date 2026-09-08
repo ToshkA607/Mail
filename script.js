@@ -6,7 +6,12 @@ const VALID_KEYS = ['OPERATOR-2026', 'ADMIN-2026', 'DIRECTOR-2026', 'MASTER-2026
 function handleLogin(e) {
     e.preventDefault();
     const key = document.getElementById('loginKey').value.trim();
-    if (!key) { document.getElementById('authError').textContent = '❌ Введите ключ доступа!'; return false; }
+    
+    if (!key) {
+        document.getElementById('authError').textContent = '❌ Введите ключ доступа!';
+        return false;
+    }
+    
     if (VALID_KEYS.includes(key)) {
         let role = 'Сотрудник отделения', name = 'Сотрудник';
         if (key.includes('ADMIN')) { role = 'Администратор'; name = 'Администратор'; }
@@ -15,20 +20,113 @@ function handleLogin(e) {
         else if (key.includes('OPERATOR')) { role = 'Оператор'; name = 'Оператор'; }
         else if (key.includes('STAFF')) { role = 'Сотрудник отделения'; name = 'Сотрудник'; }
         
-        document.getElementById('authScreen').style.display = 'none';
-        document.getElementById('sidebar').style.display = 'flex';
-        document.getElementById('mainContent').style.display = 'block';
-        document.getElementById('displayName').textContent = name;
-        document.getElementById('displayRole').textContent = role;
-        document.getElementById('avatarLetter').textContent = name.charAt(0).toUpperCase();
+        // ТРАНСЛИТЕРАЦИЯ ДЛЯ EMAIL (без русских букв)
+        const emailMap = {
+            'оператор': 'operator',
+            'администратор': 'admin',
+            'руководитель': 'director',
+            'мастер': 'master',
+            'сотрудник': 'staff'
+        };
+        const emailName = emailMap[name.toLowerCase()] || name.toLowerCase();
+        const email = emailName + '@postal.ru';
+        const password = key;
         
-        document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
-        const firstPage = document.querySelector('.page-section');
-        if (firstPage) firstPage.classList.add('active');
+        console.log('Попытка входа для:', email);
         
-        initData();
-        renderAll();
-        showToast('Добро пожаловать, ' + name + '!', 'success');
+        const btn = document.querySelector('.btn-auth');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Вход...';
+        btn.disabled = true;
+        
+        // СНАЧАЛА ПЫТАЕМСЯ ВОЙТИ
+        auth.signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                currentUser = user;
+                console.log('✅ Вход выполнен:', user.email);
+                
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('sidebar').style.display = 'flex';
+                document.getElementById('mainContent').style.display = 'block';
+                document.getElementById('displayName').textContent = name;
+                document.getElementById('displayRole').textContent = role;
+                document.getElementById('avatarLetter').textContent = name.charAt(0).toUpperCase();
+                
+                document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+                const firstPage = document.querySelector('.page-section');
+                if (firstPage) firstPage.classList.add('active');
+                
+                initData();
+                renderAll();
+                showToast('Добро пожаловать, ' + name + '!', 'success');
+                
+                setTimeout(() => {
+                    loadDataFromFirestore();
+                }, 500);
+                
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            })
+            .catch((error) => {
+                console.error('Ошибка входа:', error.code, error.message);
+                
+                // ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ СУЩЕСТВУЕТ - РЕГИСТРИРУЕМ
+                if (error.code === 'auth/user-not-found') {
+                    console.log('Пользователь не найден, регистрируем:', email);
+                    
+                    auth.createUserWithEmailAndPassword(email, password)
+                        .then((userCredential) => {
+                            const user = userCredential.user;
+                            currentUser = user;
+                            console.log('✅ Пользователь зарегистрирован:', user.email);
+                            
+                            return user.updateProfile({ displayName: name });
+                        })
+                        .then(() => {
+                            document.getElementById('authScreen').style.display = 'none';
+                            document.getElementById('sidebar').style.display = 'flex';
+                            document.getElementById('mainContent').style.display = 'block';
+                            document.getElementById('displayName').textContent = name;
+                            document.getElementById('displayRole').textContent = role;
+                            document.getElementById('avatarLetter').textContent = name.charAt(0).toUpperCase();
+                            
+                            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+                            const firstPage = document.querySelector('.page-section');
+                            if (firstPage) firstPage.classList.add('active');
+                            
+                            initData();
+                            renderAll();
+                            showToast('Добро пожаловать, ' + name + '!', 'success');
+                            
+                            setTimeout(() => {
+                                saveDataToFirestore();
+                            }, 500);
+                            
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        })
+                        .catch((regError) => {
+                            console.error('Ошибка регистрации:', regError.code, regError.message);
+                            document.getElementById('authError').textContent = '❌ Ошибка регистрации: ' + regError.message;
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        });
+                } else if (error.code === 'auth/too-many-requests') {
+                    document.getElementById('authError').textContent = '❌ Слишком много попыток. Подождите 5 минут.';
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                } else if (error.code === 'auth/invalid-login-credentials') {
+                    document.getElementById('authError').textContent = '❌ Неверный ключ доступа. Проверьте правильность ввода.';
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                } else {
+                    document.getElementById('authError').textContent = '❌ Ошибка: ' + error.message;
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            });
+        
         return false;
     } else {
         document.getElementById('authError').textContent = '❌ Неверный ключ доступа!';
@@ -37,12 +135,49 @@ function handleLogin(e) {
 }
 
 function logout() {
-    document.getElementById('authScreen').style.display = 'flex';
-    document.getElementById('sidebar').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'none';
-    document.getElementById('authError').textContent = '';
-    showToast('Вы вышли из системы', 'info');
+    // Выход из Firebase
+    auth.signOut().then(() => {
+        document.getElementById('authScreen').style.display = 'flex';
+        document.getElementById('sidebar').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'none';
+        document.getElementById('authError').textContent = '';
+        showToast('Вы вышли из системы', 'info');
+    }).catch((error) => {
+        console.error('Ошибка выхода:', error);
+    });
 }
+
+// ================================================================
+//  НАСТРОЙКА FIREBASE (ДОБАВЛЕНО)
+// ================================================================
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBsBC-_jU78ye9tICP3zhBTVrxRP0eRzvc",
+    authDomain: "postal-arm.firebaseapp.com",
+    projectId: "postal-arm",
+    storageBucket: "postal-arm.firebasestorage.app",
+    messagingSenderId: "423531673390",
+    appId: "1:423531673390:web:07dee2c604bb794332ecbf"
+};
+
+// Инициализация Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+// Переменная для текущего пользователя
+let currentUser = null;
+
+// Проверка состояния пользователя
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        currentUser = user;
+        console.log('✅ Пользователь авторизован:', user.email);
+    } else {
+        currentUser = null;
+        console.log('❌ Пользователь не авторизован');
+    }
+});
 
 // ================================================================
 //  2. ЗАЯВКА НА ДОСТУП
@@ -505,10 +640,17 @@ function initData() {
             appData = getDefaultData();
             localStorage.setItem('yas_arm_data', JSON.stringify(appData));
         }
-        return;
+    } else {
+        appData = getDefaultData();
+        localStorage.setItem('yas_arm_data', JSON.stringify(appData));
     }
-    appData = getDefaultData();
-    localStorage.setItem('yas_arm_data', JSON.stringify(appData));
+    
+    // Если пользователь авторизован, загружаем данные из Firestore
+    if (currentUser) {
+        setTimeout(() => {
+            loadDataFromFirestore();
+        }, 500);
+    }
 }
 
 function getDefaultData() {
@@ -1988,6 +2130,34 @@ function printJournal() {
         return;
     }
     exportToPDF('journalBody', 'Журнал_операций');
+}
+
+function exportTableToExcel(tableId, filename) {
+    const table = document.getElementById(tableId);
+    if (!table) {
+        showToast('Таблица не найдена!', 'error');
+        return;
+    }
+    const rows = table.querySelectorAll('tbody tr');
+    if (rows.length === 0 || (rows[0] && rows[0].textContent.includes('Нет данных'))) {
+        showToast('Нет данных для экспорта', 'warning');
+        return;
+    }
+    exportToExcelTable(tableId, filename);
+}
+
+function printTable(tableId, filename) {
+    const table = document.getElementById(tableId);
+    if (!table) {
+        showToast('Таблица не найдена!', 'error');
+        return;
+    }
+    const rows = table.querySelectorAll('tbody tr');
+    if (rows.length === 0 || (rows[0] && rows[0].textContent.includes('Нет данных'))) {
+        showToast('Нет данных для печати', 'warning');
+        return;
+    }
+    exportToPDF(tableId, filename);
 }
 
 // ================================================================
@@ -5000,6 +5170,172 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// ================================================================
+//  ПЕРЕКЛЮЧЕНИЕ ТЁМНОЙ ТЕМЫ
+// ================================================================
+
+function toggleTheme() {
+    const body = document.body;
+    const btn = document.getElementById('themeToggle');
+    
+    body.classList.toggle('dark-mode');
+    
+    if (body.classList.contains('dark-mode')) {
+        btn.innerHTML = '<i class="fas fa-sun"></i>';
+        localStorage.setItem('theme', 'dark');
+        showToast('🌙 Тёмная тема включена', 'info');
+    } else {
+        btn.innerHTML = '<i class="fas fa-moon"></i>';
+        localStorage.setItem('theme', 'light');
+        showToast('☀️ Светлая тема включена', 'info');
+    }
+}
+
+// При загрузке проверяем сохранённую тему
+document.addEventListener('DOMContentLoaded', function() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('themeToggle').innerHTML = '<i class="fas fa-sun"></i>';
+    }
+});
+
+// ================================================================
+//  СИНХРОНИЗАЦИЯ С FIRESTORE
+// ================================================================
+
+// Сохранение данных в Firestore
+async function saveDataToFirestore() {
+    if (!currentUser) {
+        console.warn('⚠️ Пользователь не авторизован');
+        return false;
+    }
+    
+    try {
+        const dataToSave = {
+            parcels: appData.parcels || [],
+            rpo: appData.rpo || [],
+            services: appData.services || [],
+            products: appData.products || [],
+            goodsStock: appData.goodsStock || [],
+            goodsReceipt: appData.goodsReceipt || [],
+            goodsWriteoff: appData.goodsWriteoff || [],
+            goodsMove: appData.goodsMove || [],
+            goodsReturn: appData.goodsReturn || [],
+            goodsUtil: appData.goodsUtil || [],
+            delivery: appData.delivery || [],
+            deliveryReturn: appData.deliveryReturn || [],
+            lottery: appData.lottery || [],
+            insurance: appData.insurance || [],
+            sim: appData.sim || [],
+            digital: appData.digital || [],
+            telegram: appData.telegram || [],
+            copy: appData.copy || [],
+            pension: appData.pension || [],
+            cityPayments: appData.cityPayments || [],
+            utilityPayments: appData.utilityPayments || [],
+            withdrawHistory: appData.withdrawHistory || [],
+            depositHistory: appData.depositHistory || [],
+            incoming: appData.incoming || [],
+            documents: appData.documents || [],
+            capacity: appData.capacity || [],
+            invoice: appData.invoice || [],
+            driver: appData.driver || [],
+            postmanTasks: appData.postmanTasks || [],
+            storageJournal: appData.storageJournal || [],
+            addressStorage: appData.addressStorage || [],
+            returnForward: appData.returnForward || [],
+            cashReport: appData.cashReport || [],
+            report2ap: appData.report2ap || [],
+            rpoReport: appData.rpoReport || [],
+            goodsReport: appData.goodsReport || [],
+            serviceCash: appData.serviceCash || [],
+            incidents: appData.incidents || [],
+            currentId: appData.currentId || {},
+            lastUpdated: new Date().toISOString()
+        };
+        
+        await db.collection('users').doc(currentUser.uid).set({
+            data: dataToSave,
+            email: currentUser.email,
+            displayName: currentUser.displayName || 'Сотрудник',
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        
+        console.log('✅ Данные сохранены в Firestore');
+        showToast('💾 Данные сохранены в облаке', 'success');
+        return true;
+    } catch (error) {
+        console.error('❌ Ошибка сохранения:', error);
+        showToast('❌ Ошибка сохранения данных', 'error');
+        return false;
+    }
+}
+
+// Загрузка данных из Firestore
+async function loadDataFromFirestore() {
+    if (!currentUser) {
+        console.warn('⚠️ Пользователь не авторизован');
+        return false;
+    }
+    
+    try {
+        const doc = await db.collection('users').doc(currentUser.uid).get();
+        
+        if (doc.exists) {
+            const data = doc.data().data;
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    if (key !== 'lastUpdated' && key !== 'currentId') {
+                        appData[key] = data[key];
+                    }
+                });
+                if (data.currentId) {
+                    appData.currentId = data.currentId;
+                }
+                
+                localStorage.setItem('yas_arm_data', JSON.stringify(appData));
+                console.log('✅ Данные загружены из Firestore');
+                showToast('📥 Данные загружены из облака', 'success');
+                return true;
+            }
+        } else {
+            console.log('📭 Данных в Firestore нет, создаём новую запись');
+            await saveDataToFirestore();
+        }
+        return false;
+    } catch (error) {
+        console.error('❌ Ошибка загрузки:', error);
+        return false;
+    }
+}
+
+// Синхронизация данных
+async function syncDataFromFirebase() {
+    const loaded = await loadDataFromFirestore();
+    if (loaded) {
+        renderAll();
+        updateReportStats();
+        updateServiceStats();
+        updateBackStats();
+        initCharts();
+    }
+}
+
+// Принудительное сохранение
+async function forceSaveToFirestore() {
+    await saveDataToFirestore();
+}
+
+// Переопределяем saveData для автоматической синхронизации
+const originalSaveData = saveData;
+saveData = function() {
+    originalSaveData();
+    if (currentUser) {
+        saveDataToFirestore();
+    }
+};
 
 // ================================================================
 //  ИНИЦИАЛИЗАЦИЯ
