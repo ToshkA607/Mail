@@ -1773,1143 +1773,1332 @@
 }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
-    <!-- ======= ЭКРАН ВХОДА ======= -->
-    <div id="authScreen">
-        <!-- ======= АНИМИРОВАННЫЙ ФОН С ИКОНКАМИ ======= -->
-        <div class="auth-background">
-            <i class="fas fa-envelope-open-text icon"></i>
-            <i class="fas fa-mail-bulk icon"></i>
-            <i class="fas fa-box icon"></i>
-            <i class="fas fa-stamp icon"></i>
-            <i class="fas fa-truck icon"></i>
-            <i class="fas fa-pencil-alt icon"></i>
-            <i class="fas fa-envelope icon"></i>
-            <i class="fas fa-address-card icon"></i>
-            <i class="fas fa-file-signature icon"></i>
-            <i class="fas fa-certificate icon"></i>
-        </div>
-        <div class="auth-card">
-            <div class="logo-icon"><i class="fas fa-envelope-open-text"></i></div>
-            <h1><i class="fas fa-envelope"></i> Почта России</h1>
-            <p class="sub"></p>
-            <form id="loginForm" onsubmit="return handleLogin(event)">
-                <div class="form-group">
-                    <label><i class="fas fa-key"></i> Ключ доступа</label>
-                    <input type="text" id="loginKey" placeholder="Введите ключ доступа" value="OPERATOR-2026" required autofocus>
-                    <div class="hint">Ключ выдаётся администратором после регистрации</div>
-                </div>
-                <button type="submit" class="btn-auth"><i class="fas fa-sign-in-alt"></i> Войти в систему</button>
-                <button type="button" class="btn-request" onclick="openModal('requestModal')">
-                    <i class="fas fa-paper-plane"></i> Нет ключа доступа? Подать заявку
-                </button>
-                <div class="auth-error" id="authError"></div>
-            </form>
-            <div class="auth-footer"><i class="fas fa-shield-alt"></i> Безопасный вход · Все данные защищены</div>
-        </div>
+<!-- ======= ЭКРАН ВХОДА ======= -->
+<div id="authScreen">
+    <!-- ======= АНИМИРОВАННЫЙ ФОН С ИКОНКАМИ ======= -->
+    <div class="auth-background">
+        <i class="fas fa-envelope-open-text icon"></i>
+        <i class="fas fa-mail-bulk icon"></i>
+        <i class="fas fa-box icon"></i>
+        <i class="fas fa-stamp icon"></i>
+        <i class="fas fa-truck icon"></i>
+        <i class="fas fa-pencil-alt icon"></i>
+        <i class="fas fa-envelope icon"></i>
+        <i class="fas fa-address-card icon"></i>
+        <i class="fas fa-file-signature icon"></i>
+        <i class="fas fa-certificate icon"></i>
     </div>
-
-    <!-- ======= МОДАЛКА ЗАЯВКИ ======= -->
-    <div class="modal-overlay" id="requestModal">
-        <div class="modal-window">
-            <h3><i class="fas fa-user-plus" style="color:var(--accent);"></i> Заявка на получение ключа доступа</h3>
-            <p class="modal-sub">Заполните форму, и администратор вышлет вам ключ доступа на указанную почту.</p>
-            <form id="requestForm" action="https://formspree.io/f/xjyvvgbp" method="POST" onsubmit="return submitRequest(event)">
-    <div class="form-group"><label>ФИО <span class="required">*</span></label><input type="text" id="reqName" name="name" placeholder="Иванов Иван Иванович" required></div>
-    <div class="form-row">
-        <div class="form-group"><label>Дата рождения</label><input type="date" id="reqBirthdate" name="birthdate"></div>
-        <div class="form-group"><label>Телефон <span class="required">*</span></label><input type="tel" id="reqPhone" name="phone" placeholder="+7 999 123-45-67" required></div>
-    </div>
-    <div class="form-row">
-        <div class="form-group"><label>Серия паспорта <span class="required">*</span></label><input type="text" id="reqPassportSeries" name="passport_series" placeholder="12 34" required></div>
-        <div class="form-group"><label>Номер паспорта <span class="required">*</span></label><input type="text" id="reqPassportNumber" name="passport_number" placeholder="567890" required></div>
-    </div>
-    <div class="form-row">
-        <div class="form-group"><label>Email <span class="required">*</span></label><input type="email" id="reqEmail" name="_replyto" placeholder="your@email.com" required></div>
-        <div class="form-group"><label>Отделение / Подразделение</label><input type="text" id="reqDepartment" name="department" placeholder="Отделение №1, г. Москва"></div>
-    </div>
-    
-    <!-- Скрытые поля для улучшения доставляемости -->
-    <input type="hidden" name="_subject" value="📋 Новая заявка на доступ к АРМ">
-    <input type="hidden" name="_captcha" value="false">
-    <input type="hidden" name="_format" value="html">
-    <input type="text" name="_gotcha" style="display:none">
-    
-    <div class="modal-actions">
-        <button type="button" class="btn btn-outline" onclick="closeModal('requestModal')">Отмена</button>
-        <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Отправить заявку</button>
-    </div>
-</form> 
-            <div class="request-success" id="requestSuccess">
-                <i class="fas fa-check-circle"></i>
-                <h4>Заявка отправлена!</h4>
-                <p>Администратор рассмотрит вашу заявку и вышлет ключ доступа на указанный email в ближайшее время.</p>
-                <button class="btn btn-primary" style="margin-top:12px;" onclick="closeModal('requestModal')">Закрыть</button>
+    <div class="auth-card">
+        <div class="logo-icon"><i class="fas fa-envelope-open-text"></i></div>
+        <h1><i class="fas fa-envelope"></i> Почта России</h1>
+        <p class="sub"></p>
+        <form id="loginForm" onsubmit="return handleLogin(event)">
+            <div class="form-group">
+                <label><i class="fas fa-key"></i> Ключ доступа</label>
+                <input type="text" id="loginKey" placeholder="Введите ключ доступа" value="OPERATOR-2026" required autofocus>
+                <div class="hint">Ключ выдаётся администратором после регистрации</div>
             </div>
-        </div>
+            <button type="submit" class="btn-auth"><i class="fas fa-sign-in-alt"></i> Войти в систему</button>
+            <button type="button" class="btn-request" onclick="openModal('requestModal')">
+                <i class="fas fa-paper-plane"></i> Нет ключа доступа? Подать заявку
+            </button>
+            <div class="auth-error" id="authError"></div>
+        </form>
+        <div class="auth-footer"><i class="fas fa-shield-alt"></i> Безопасный вход · Все данные защищены</div>
     </div>
-
-    <!-- ======= БОКОВОЕ МЕНЮ ======= -->
-    <nav id="sidebar">
-        <div class="brand"><i class="fas fa-envelope"></i><div><span></span><small>Почта России</small></div></div>
-        <div class="user-info">
-            <div class="avatar" id="avatarLetter">С</div>
-            <div><div class="uname" id="displayName">Сотрудник</div><div class="urole" id="displayRole">Сотрудник отделения</div></div>
-        </div>
-        <ul class="nav-menu">
-            <li class="nav-label">Основные модули</li>
-            <li><a data-page="front"><i class="fas fa-store-alt"></i> Фронт-зона</a></li>
-            <li><a data-page="back"><i class="fas fa-warehouse"></i> Бэк-зона</a></li>
-            <li><a class="active" data-page="reports"><i class="fas fa-chart-pie"></i> Отчёты</a></li>
-            <li><a data-page="service"><i class="fas fa-cogs"></i> Служебные операции</a></li>
-            <li class="nav-label">Коммуникации</li>
-            <li><a data-page="support" class="feedback-link"><i class="fas fa-headset"></i> Обратная связь</a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти</button>
-        </div>
-    </nav>
-
-    <!-- ======= ОСНОВНОЙ КОНТЕНТ ======= -->
-    <div id="mainContent">
-        <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i> Меню</button>
-
-        <!-- СТРАНИЦА: ФРОНТ-ЗОНА -->
-        <div class="page-section" id="page-front">
-            <div class="tabs-container">
-                <div class="tabs-header">
-                    <button class="tab-btn active" data-tab="front-reception"><i class="fas fa-inbox"></i> Приём</button>
-                    <button class="tab-btn" data-tab="front-goods"><i class="fas fa-boxes"></i> Товары</button>
-                    <button class="tab-btn" data-tab="front-delivery"><i class="fas fa-hand-holding-heart"></i> Вручение</button>
-                    <button class="tab-btn" data-tab="front-commercial"><i class="fas fa-shopping-bag"></i> Коммерческие услуги</button>
-                    <button class="tab-btn" data-tab="front-payments"><i class="fas fa-credit-card"></i> Платежи и выплаты</button>
-                    <button class="tab-btn" data-tab="front-cards"><i class="fas fa-id-card"></i> Операции с картой</button>
-                </div>
-
-                <!-- Приём -->
-                <div class="tab-content active" id="front-reception">
-                    <div class="sub-tabs-grid">
-                        <button class="sub-tab-btn active" data-subtab="reception-simple"><i class="fas fa-arrow-right"></i> Упрощённый приём</button>
-                        <button class="sub-tab-btn" data-subtab="reception-rpo"><i class="fas fa-qrcode"></i> Приём РПО</button>
-                        <button class="sub-tab-btn" data-subtab="reception-extra"><i class="fas fa-plus-circle"></i> Доп. услуги</button>
-                    </div>
-                    <!-- Упрощённый приём -->
-                    <div class="sub-tab-content active" id="reception-simple">
-                        <div class="toolbar">
-                            <button class="btn btn-success btn-sm" onclick="openModal('parcelModal')"><i class="fas fa-plus"></i> Принять</button>
-                            <span class="spacer"></span>
-                            <input type="text" id="parcelSearch" placeholder="🔍 Поиск по треку..." oninput="renderParcels()" style="width:200px;">
-                        </div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>Трек</th><th>Отправитель</th><th>Получатель</th><th>Тип</th><th>Вес</th><th>Статус</th><th>Действия</th></tr></thead>
-                                <tbody id="parcelsTableBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <!-- Приём РПО -->
-                    <div class="sub-tab-content" id="reception-rpo">
-                        <div class="toolbar"><button class="btn btn-success btn-sm" onclick="openModal('rpoModal')"><i class="fas fa-plus"></i> Добавить РПО</button></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>Трек</th><th>Тип РПО</th><th>Отправитель</th><th>Получатель</th><th>Вес (г)</th><th>Ценность</th><th>Стоимость</th><th>Статус</th></tr></thead>
-                                <tbody id="rpoTableBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <!-- Доп. услуги -->
-                    <div class="sub-tab-content" id="reception-extra">
-                        <div class="toolbar">
-                            <button class="btn btn-success btn-sm" onclick="openModal('extraServiceModal')"><i class="fas fa-plus"></i> Добавить услугу</button>
-                            <button class="btn btn-accent btn-sm" onclick="addExtraToCart()"><i class="fas fa-shopping-cart"></i> В корзину</button>
-                            <span class="spacer"></span>
-                            <span style="font-size:13px;color:var(--gray-500);">Выберите услугу для добавления в заказ</span>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>ID</th><th>Услуга</th><th>Цена (₽)</th><th>Описание</th><th>Действия</th></tr></thead>
-                                <tbody id="extraServicesBody"></tbody>
-                            </table>
-                        </div>
-                        <div id="extraServiceCartInfo" style="margin-top:12px;padding:12px;background:var(--gray-50);border-radius:var(--radius-sm);display:none;">
-                            <span style="font-weight:600;">Услуги в корзине:</span>
-                            <span id="extraCartCount">0</span> услуг на сумму <span id="extraCartTotal">0</span> ₽
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Товары -->
-                <div class="tab-content" id="front-goods">
-                    <div class="sub-tabs-grid">
-                        <button class="sub-tab-btn active" data-subtab="goods-sale"><i class="fas fa-shopping-cart"></i> Продажа ТМЦ</button>
-                        <button class="sub-tab-btn" data-subtab="goods-stock"><i class="fas fa-archive"></i> Остатки ТМЦ</button>
-                        <button class="sub-tab-btn" data-subtab="goods-receipt"><i class="fas fa-arrow-down"></i> Приход</button>
-                        <button class="sub-tab-btn" data-subtab="goods-writeoff"><i class="fas fa-trash-alt"></i> Списание</button>
-                        <button class="sub-tab-btn" data-subtab="goods-move"><i class="fas fa-arrows-alt-h"></i> Перемещение</button>
-                        <button class="sub-tab-btn" data-subtab="goods-inventory"><i class="fas fa-clipboard-list"></i> Инвентаризация</button>
-                        <button class="sub-tab-btn" data-subtab="goods-return"><i class="fas fa-undo"></i> Возврат</button>
-                        <button class="sub-tab-btn" data-subtab="goods-util"><i class="fas fa-recycle"></i> Утилизация</button>
-                    </div>
-                    <div class="sub-tab-content active" id="goods-sale">
-                        <div class="filter-buttons">
-                            <button class="filter-btn active" onclick="filterGoods('all')">Все товары</button>
-                            <button class="filter-btn" onclick="filterGoods('openki')">Открытки</button>
-                            <button class="filter-btn" onclick="filterGoods('calendars')">Календари</button>
-                            <button class="filter-btn" onclick="filterGoods('konverty')">Конверты</button>
-                            <button class="filter-btn" onclick="filterGoods('upakovka')">Упаковка</button>
-                            <button class="filter-btn" onclick="filterGoods('hoztovary')">Хоз. товары</button>
-                            <button class="filter-btn" onclick="filterGoods('electronics')">Электроника</button>
-                            <button class="filter-btn" onclick="filterGoods('food')">Питание</button>
-                        </div>
-                        <div class="toolbar">
-                            <button class="btn btn-success btn-sm" onclick="openModal('productModal')"><i class="fas fa-plus"></i> Добавить товар</button>
-                            <button class="btn btn-accent btn-sm" onclick="addToCartFromGoods()"><i class="fas fa-shopping-cart"></i> В корзину</button>
-                            <span class="spacer"></span>
-                            <input type="text" id="goodsSearch" placeholder="🔍 Поиск товара..." oninput="renderGoods()" style="width:180px;">
-                        </div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>Артикул</th><th>Наименование</th><th>Категория</th><th>Кол-во</th><th>Цена</th><th>Сумма</th><th>Статус</th><th>Действия</th></tr></thead>
-                                <tbody id="goodsTableBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="goods-stock">
-                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
-                            <span style="font-size:13px;color:var(--gray-500);">Остатки товаров на складах</span>
-                            <button class="btn btn-primary btn-sm" onclick="refreshStock()"><i class="fas fa-sync"></i> Обновить</button>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>ID</th><th>Наименование</th><th>Категория</th><th>Остаток (шт.)</th><th>Склад</th><th>Стоимость (₽)</th></tr></thead>
-                                <tbody id="goodsStockBody"></tbody>
-                                <tfoot id="goodsStockFooter"></tfoot>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="goods-receipt">
-                        <div class="toolbar"><button class="btn btn-success btn-sm" onclick="openModal('goodsReceiptModal')"><i class="fas fa-plus"></i> Оприходовать</button></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>№</th><th>Товар</th><th>Категория</th><th>Кол-во</th><th>Цена</th><th>Дата</th><th>Принял</th></tr></thead>
-                                <tbody id="goodsReceiptBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="goods-writeoff">
-                        <div class="toolbar"><button class="btn btn-danger btn-sm" onclick="openModal('goodsWriteoffModal')"><i class="fas fa-plus"></i> Списать</button></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>№</th><th>Товар</th><th>Категория</th><th>Кол-во</th><th>Дата</th><th>Ответственный</th></tr></thead>
-                                <tbody id="goodsWriteoffBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="goods-move">
-                        <div class="toolbar"><button class="btn btn-accent btn-sm" onclick="openModal('goodsMoveModal')"><i class="fas fa-plus"></i> Переместить</button></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>№</th><th>Товар</th><th>Откуда</th><th>Куда</th><th>Кол-во</th><th>Дата</th></tr></thead>
-                                <tbody id="goodsMoveBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="goods-inventory">
-                        <div class="toolbar"><button class="btn btn-primary btn-sm" onclick="startInventory()"><i class="fas fa-play"></i> Начать инвентаризацию</button></div>
-                        <div id="inventoryResult" style="padding:16px;background:var(--gray-50);border-radius:var(--radius-sm);margin-top:12px;">
-                            <p class="text-muted"><i class="fas fa-info-circle"></i> Инвентаризация не запущена. Нажмите "Начать инвентаризацию".</p>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="goods-return">
-                        <div class="toolbar"><button class="btn btn-warning btn-sm" onclick="openModal('goodsReturnModal')"><i class="fas fa-plus"></i> Оформить возврат</button></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>№</th><th>Товар</th><th>Клиент</th><th>Сумма</th><th>Дата</th><th>Статус</th></tr></thead>
-                                <tbody id="goodsReturnBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="goods-util">
-                        <div class="toolbar"><button class="btn btn-danger btn-sm" onclick="openModal('goodsUtilModal')"><i class="fas fa-plus"></i> Утилизировать</button></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>№</th><th>Товар</th><th>Кол-во</th><th>Дата</th><th>Ответственный</th></tr></thead>
-                                <tbody id="goodsUtilBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Вручение -->
-                <div class="tab-content" id="front-delivery">
-                    <div class="sub-tabs-grid">
-                        <button class="sub-tab-btn active" data-subtab="delivery-main"><i class="fas fa-hand-holding-heart"></i> Вручение РПО</button>
-                        <button class="sub-tab-btn" data-subtab="delivery-return"><i class="fas fa-undo-alt"></i> Возврат</button>
-                    </div>
-                    <div class="sub-tab-content active" id="delivery-main">
-                        <div class="toolbar">
-                            <button class="btn btn-accent btn-sm" onclick="openModal('deliveryModal')"><i class="fas fa-hand-holding-heart"></i> Вручить</button>
-                            <span class="spacer"></span>
-                            <input type="text" id="deliverySearch" placeholder="🔍 Поиск по треку..." oninput="renderDelivery()" style="width:200px;">
-                        </div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>Трек</th><th>Получатель</th><th>Отправитель</th><th>Тип</th><th>Статус</th><th>Дата</th><th>Действия</th></tr></thead>
-                                <tbody id="deliveryBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="delivery-return">
-                        <div class="toolbar"><button class="btn btn-warning btn-sm" onclick="openModal('deliveryReturnModal')"><i class="fas fa-plus"></i> Оформить возврат</button></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>Трек</th><th>Отправитель</th><th>Получатель</th><th>Адрес отправителя</th><th>Адрес получателя</th><th>Дата возврата</th><th>Статус</th></tr></thead>
-                                <tbody id="deliveryReturnBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Коммерческие услуги -->
-                <div class="tab-content" id="front-commercial">
-                    <div class="sub-tabs-grid">
-                        <button class="sub-tab-btn active" data-subtab="commercial-lottery"><i class="fas fa-ticket-alt"></i> Национальные лотереи</button>
-                        <button class="sub-tab-btn" data-subtab="commercial-insurance"><i class="fas fa-shield-alt"></i> Страховки АРФУ</button>
-                        <button class="sub-tab-btn" data-subtab="commercial-sim"><i class="fas fa-sim-card"></i> Продажа SIM-карт</button>
-                        <button class="sub-tab-btn" data-subtab="commercial-digital"><i class="fas fa-mobile-alt"></i> Цифровые сервисы</button>
-                        <button class="sub-tab-btn" data-subtab="commercial-telegram"><i class="fas fa-telegram"></i> Приём телеграмм</button>
-                        <button class="sub-tab-btn" data-subtab="commercial-copy"><i class="fas fa-copy"></i> Ксерокопии</button>
-                    </div>
-                    <div class="sub-tab-content active" id="commercial-lottery">
-                        <div class="lottery-actions">
-    <button class="lottery-btn" onclick="openModal('lotterySaleModal')"><i class="fas fa-ticket-alt"></i> Реализация лотерей</button>
-    <button class="lottery-btn" onclick="openModal('lotteryPayModal')"><i class="fas fa-money-bill-wave"></i> Выплата</button>
-    <button class="lottery-btn" onclick="generateLotteryReport()"><i class="fas fa-chart-bar"></i> Отчёты</button>
-    <button class="lottery-btn" onclick="openModal('lotterySettingsModal')"><i class="fas fa-sliders-h"></i> Настройки</button>
 </div>
-                        <div id="lotteryReport" style="margin-top:12px;"></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>№ билета</th><th>Клиент</th><th>Сумма</th><th>Дата</th><th>Статус</th></tr></thead>
-                                <tbody id="lotteryBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="commercial-insurance">
-                        <div class="toolbar"><button class="btn btn-success btn-sm" onclick="openModal('insuranceModal')"><i class="fas fa-plus"></i> Оформить страховку</button></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>№ полиса</th><th>Клиент</th><th>Паспорт</th><th>Дата рождения</th><th>Сумма</th><th>Дата</th><th>Статус</th></tr></thead>
-                                <tbody id="insuranceBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="commercial-sim">
-                        <div class="toolbar"><button class="btn btn-success btn-sm" onclick="openModal('simModal')"><i class="fas fa-plus"></i> Активировать SIM</button></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>№ SIM</th><th>Номер</th><th>Оператор</th><th>Тариф</th><th>Статус</th></tr></thead>
-                                <tbody id="simBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="commercial-digital">
-                        <div class="toolbar"><button class="btn btn-accent btn-sm" onclick="openModal('digitalModal')"><i class="fas fa-plus"></i> Подключить сервис</button></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>Услуга</th><th>Клиент</th><th>Цена</th><th>Дата</th><th>Статус</th></tr></thead>
-                                <tbody id="digitalBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="commercial-telegram">
-                        <div class="toolbar"><button class="btn btn-accent btn-sm" onclick="openModal('telegramModal')"><i class="fas fa-plus"></i> Принять телеграмму</button></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>№</th><th>Отправитель</th><th>Адрес отправителя</th><th>Получатель</th><th>Адрес получателя</th><th>Текст</th><th>Слов</th><th>Стоимость</th><th>Дата</th><th>Статус</th></tr></thead>
-                                <tbody id="telegramBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="commercial-copy">
-                        <div class="toolbar">
-                            <button class="btn btn-accent btn-sm" onclick="openModal('copyModal')"><i class="fas fa-plus"></i> Новая копия</button>
-                            <span class="spacer"></span>
-                            <select style="padding:7px 14px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);">
-                                <option>Ч/б копия</option>
-                                <option>Цветная копия</option>
-                                <option>Скан</option>
-                                <option>Распечатка</option>
-                            </select>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>№</th><th>Клиент</th><th>Тип</th><th>Кол-во</th><th>Стоимость</th><th>Дата</th></tr></thead>
-                                <tbody id="copyBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Платежи и выплаты -->
-                <div class="tab-content" id="front-payments">
-                    <div class="sub-tabs-grid">
-                        <button class="sub-tab-btn active" data-subtab="payments-pension"><i class="fas fa-piggy-bank"></i> Пенсия и пособия</button>
-                        <button class="sub-tab-btn" data-subtab="payments-city"><i class="fas fa-city"></i> Система Город</button>
-                        <button class="sub-tab-btn" data-subtab="payments-utility"><i class="fas fa-home"></i> Коммунальные платежи</button>
-                    </div>
-                    <div class="sub-tab-content active" id="payments-pension">
-                        <div class="toolbar"><button class="btn btn-success btn-sm" onclick="openModal('pensionModal')"><i class="fas fa-plus"></i> Назначить выплату</button></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>№</th><th>ФИО</th><th>СНИЛС</th><th>Сумма</th><th>Тип</th><th>Дата</th><th>Статус</th></tr></thead>
-                                <tbody id="pensionBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="payments-city">
-                        <div class="quick-payments">
-                            <button class="qp-btn" onclick="openModal('paymentPhoneModal')"><i class="fas fa-phone"></i> Телефон</button>
-                            <button class="qp-btn" onclick="openModal('paymentTrashModal')"><i class="fas fa-trash-alt"></i> Мусор</button>
-                            <button class="qp-btn" onclick="openModal('paymentFineModal')"><i class="fas fa-gavel"></i> Штрафы</button>
-                            <button class="qp-btn" onclick="openModal('paymentTaxModal')"><i class="fas fa-landmark"></i> Налоги</button>
-                        </div>
-                        <div class="catalog-actions" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin:16px 0;">
-                            <button class="btn btn-primary" style="padding:16px;justify-content:center;" onclick="openModal('paymentServiceModal')"><i class="fas fa-hand-holding-usd"></i> Оплата услуг</button>
-                            <button class="btn btn-danger" style="padding:16px;justify-content:center;" onclick="openModal('paymentCreditModal')"><i class="fas fa-university"></i> Погашение кредитов</button>
-                            <button class="btn btn-info" style="padding:16px;justify-content:center;" onclick="openModal('paymentHistoryModal')"><i class="fas fa-history"></i> История платежей</button>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>№</th><th>Плательщик</th><th>Услуга</th><th>Сумма</th><th>Дата</th><th>Статус</th></tr></thead>
-                                <tbody id="cityPaymentsBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="payments-utility">
-                        <div style="max-width:500px;margin:0 auto;padding:24px;background:var(--gray-50);border-radius:var(--radius-sm);border:1px solid var(--gray-200);">
-                            <h4 style="color:var(--primary);margin-bottom:16px;"><i class="fas fa-home"></i> Оплата коммунальных услуг</h4>
-                            <div class="form-group">
-                                <label>Лицевой счёт <span class="required">*</span></label>
-                                <input type="text" id="utilityAccount" placeholder="Введите номер лицевого счёта" style="width:100%;padding:10px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);">
-                            </div>
-                            <div class="form-group">
-                                <label>ФИО плательщика <span class="required">*</span></label>
-                                <input type="text" id="utilityPayer" placeholder="Иванов Иван Иванович" style="width:100%;padding:10px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);">
-                            </div>
-                            <div class="form-group">
-                                <label>Услуга</label>
-                                <select id="utilityService" style="width:100%;padding:10px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);">
-                                    <option value="Электроэнергия">Электроэнергия</option>
-                                    <option value="Водоснабжение">Водоснабжение</option>
-                                    <option value="Газ">Газ</option>
-                                    <option value="Отопление">Отопление</option>
-                                    <option value="Вывоз мусора">Вывоз мусора</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Сумма платежа (₽) <span class="required">*</span></label>
-                                <input type="number" id="utilPayAmount" placeholder="Введите сумму" style="width:100%;padding:10px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);">
-                            </div>
-                            <button class="btn btn-success" style="width:100%;padding:12px;justify-content:center;" onclick="payUtilityNew()"><i class="fas fa-check"></i> Оплатить</button>
-                        </div>
-                        <div class="table-responsive" style="margin-top:16px;">
-                            <table class="data-table">
-                                <thead><tr><th>№</th><th>Плательщик</th><th>Услуга</th><th>Сумма</th><th>Дата</th><th>Статус</th></tr></thead>
-                                <tbody id="utilityPaymentsBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Операции с картой -->
-                <div class="tab-content" id="front-cards">
-                    <div class="sub-tabs-grid">
-                        <button class="sub-tab-btn active" data-subtab="cards-balance"><i class="fas fa-wallet"></i> Запрос баланса</button>
-                        <button class="sub-tab-btn" data-subtab="cards-withdraw"><i class="fas fa-hand-holding-usd"></i> Снятие наличных</button>
-                        <button class="sub-tab-btn" data-subtab="cards-deposit"><i class="fas fa-arrow-down"></i> Зачисление наличных</button>
-                    </div>
-                    <div class="sub-tab-content active" id="cards-balance">
-                        <div class="card-form">
-                            <div class="form-group"><label>Номер карты</label><input type="text" id="balanceCard" placeholder="0000 0000 0000 0000" value="1234 5678 9012 3456"></div>
-                            <div class="form-row">
-                                <div class="form-group"><label>Срок действия</label><input type="text" id="balanceExpiry" placeholder="MM/ГГ" value="12/26"></div>
-                                <div class="form-group"><label>CVV</label><input type="password" id="balanceCvv" placeholder="***" value="123" maxlength="3"></div>
-                            </div>
-                            <button class="btn btn-primary" style="width:100%;padding:12px;justify-content:center;" onclick="checkBalance()"><i class="fas fa-search"></i> Проверить баланс</button>
-                            <div id="balanceResult" class="result-box" style="display:none;"></div>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="cards-withdraw">
-                        <div class="card-form">
-                            <div class="form-group"><label>Номер карты</label><input type="text" id="withdrawCard" placeholder="0000 0000 0000 0000" value="1234 5678 9012 3456"></div>
-                            <div class="form-group"><label>Сумма снятия (₽)</label><input type="number" id="withdrawAmount" placeholder="Введите сумму" value="5000"></div>
-                            <div class="form-row">
-                                <div class="form-group"><label>ФИО получателя</label><input type="text" id="withdrawName" placeholder="Иванов И.И." value="Иванов Иван Иванович"></div>
-                                <div class="form-group"><label>Паспорт</label><input type="text" id="withdrawPassport" placeholder="Серия и номер" value="12 34 567890"></div>
-                            </div>
-                            <button class="btn btn-danger" style="width:100%;padding:12px;justify-content:center;" onclick="processWithdraw()"><i class="fas fa-money-bill-wave"></i> Снять наличные</button>
-                            <div id="withdrawResult" class="result-box" style="display:none;"></div>
-                        </div>
-                        <div class="table-responsive" style="margin-top:16px;">
-                            <table class="data-table">
-                                <thead><tr><th>№</th><th>Клиент</th><th>Сумма</th><th>Дата</th><th>Статус</th></tr></thead>
-                                <tbody id="withdrawHistoryBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="cards-deposit">
-                        <div class="card-form">
-                            <div class="form-group"><label>Номер карты</label><input type="text" id="depositCard" placeholder="0000 0000 0000 0000" value="1234 5678 9012 3456"></div>
-                            <div class="form-group"><label>Сумма зачисления (₽)</label><input type="number" id="depositAmount" placeholder="Введите сумму" value="10000"></div>
-                            <div class="form-row">
-                                <div class="form-group"><label>ФИО вносителя</label><input type="text" id="depositName" placeholder="Иванов И.И." value="Иванов Иван Иванович"></div>
-                                <div class="form-group"><label>Способ оплаты</label>
-                                    <select id="depositMethod">
-                                        <option value="Наличные">Наличные</option>
-                                        <option value="Безналичный">Безналичный</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button class="btn btn-success" style="width:100%;padding:12px;justify-content:center;" onclick="processDeposit()"><i class="fas fa-arrow-down"></i> Зачислить наличные</button>
-                            <div id="depositResult" class="result-box" style="display:none;"></div>
-                        </div>
-                        <div class="table-responsive" style="margin-top:16px;">
-                            <table class="data-table">
-                                <thead><tr><th>№</th><th>Клиент</th><th>Сумма</th><th>Дата</th><th>Статус</th></tr></thead>
-                                <tbody id="depositHistoryBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+<!-- ======= МОДАЛКА ЗАЯВКИ ======= -->
+<div class="modal-overlay" id="requestModal">
+    <div class="modal-window">
+        <h3><i class="fas fa-user-plus" style="color:var(--accent);"></i> Заявка на получение ключа доступа</h3>
+        <p class="modal-sub">Заполните форму, и администратор вышлет вам ключ доступа на указанную почту.</p>
+        <form id="requestForm" action="https://formspree.io/f/xjyvvgbp" method="POST" onsubmit="return submitRequest(event)">
+            <div class="form-group"><label>ФИО <span class="required">*</span></label><input type="text" id="reqName" name="name" placeholder="Иванов Иван Иванович" required></div>
+            <div class="form-row">
+                <div class="form-group"><label>Дата рождения</label><input type="date" id="reqBirthdate" name="birthdate"></div>
+                <div class="form-group"><label>Телефон <span class="required">*</span></label><input type="tel" id="reqPhone" name="phone" placeholder="+7 999 123-45-67" required></div>
             </div>
-        </div>
-
-        <!-- СТРАНИЦА: БЭК-ЗОНА -->
-        <div class="page-section" id="page-back">
-            <div class="tabs-container">
-                <div class="tabs-header">
-                    <button class="tab-btn active" data-tab="back-incoming"><i class="fas fa-inbox"></i> Входящая почта</button>
-                    <button class="tab-btn" data-tab="back-outgoing"><i class="fas fa-outdent"></i> Исходящая почта</button>
-                    <button class="tab-btn" data-tab="back-delivery"><i class="fas fa-truck"></i> Доставка почты</button>
-                    <button class="tab-btn" data-tab="back-storage"><i class="fas fa-archive"></i> Хранение РПО</button>
-                </div>
-
-                <!-- Входящая почта -->
-                <div class="tab-content active" id="back-incoming">
-                    <div class="sub-tabs-grid">
-                        <button class="sub-tab-btn active" data-subtab="incoming-receive"><i class="fas fa-arrow-down"></i> Приём входящей почты</button>
-                        <button class="sub-tab-btn" data-subtab="incoming-search"><i class="fas fa-print"></i> Поиск и печать документов</button>
-                    </div>
-                    <div class="sub-tab-content active" id="incoming-receive">
-                        <div class="toolbar"><button class="btn btn-success btn-sm" onclick="openModal('incomingModal')"><i class="fas fa-plus"></i> Зафиксировать прибытие</button></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>Трек</th><th>Отправитель</th><th>Дата прибытия</th><th>Тип</th><th>Статус</th><th>Обработка</th></tr></thead>
-                                <tbody id="incomingBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="incoming-search">
-                        <div class="toolbar">
-                            <input type="date" id="docSearchFrom">
-                            <input type="date" id="docSearchTo">
-                            <input type="text" id="docSearchNumber" placeholder="🔍 № документа..." style="width:180px;">
-                            <button class="btn btn-primary btn-sm" onclick="searchDocuments()"><i class="fas fa-search"></i> Найти</button>
-                            <button class="btn btn-accent btn-sm" onclick="printDocument()"><i class="fas fa-print"></i> Печать</button>
-                        </div>
-                        <div class="table-responsive">
-    <table class="data-table">
-        <thead><tr><th>№ документа</th><th>Тип</th><th>Отправитель</th><th>Дата</th><th>Действия</th></tr></thead>
-        <tbody id="documentsBody"></tbody>
-    </table>
-</div>
-                    </div>
-                </div>
-
-                <!-- Исходящая почта -->
-                <div class="tab-content" id="back-outgoing">
-                    <div class="sub-tabs-grid">
-                        <button class="sub-tab-btn active" data-subtab="outgoing-capacity"><i class="fas fa-boxes"></i> Создание емкостей</button>
-                        <button class="sub-tab-btn" data-subtab="outgoing-invoice"><i class="fas fa-file-invoice"></i> Создание накладных</button>
-                        <button class="sub-tab-btn" data-subtab="outgoing-driver"><i class="fas fa-user-check"></i> Передача почты водителю</button>
-                    </div>
-                    <div class="sub-tab-content active" id="outgoing-capacity">
-                        <div class="toolbar">
-                            <button class="btn btn-success btn-sm" onclick="openModal('capacityModal')"><i class="fas fa-plus"></i> Создать емкость</button>
-                            <button class="btn btn-primary btn-sm" onclick="openModal('capacityEditModal')"><i class="fas fa-edit"></i> Редактировать</button>
-                        </div>
-                        <div class="capacity-grid" id="capacityGrid"></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>Емкость</th><th>Вложенные отправления</th><th>Вес</th><th>Статус</th><th>Действия</th></tr></thead>
-                                <tbody id="capacityTableBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="outgoing-invoice">
-                        <div class="toolbar">
-                            <button class="btn btn-success btn-sm" onclick="openModal('invoiceF23Modal')"><i class="fas fa-plus"></i> Накладная Ф23</button>
-                            <button class="btn btn-accent btn-sm" onclick="openModal('invoiceF23aModal')"><i class="fas fa-plus"></i> Накладная Ф23-а</button>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>№ накладной</th><th>Тип</th><th>Создал</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead>
-                                <tbody id="invoiceTableBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="outgoing-driver">
-                        <div class="toolbar">
-                            <button class="btn btn-success btn-sm" onclick="openModal('driverTransferModal')"><i class="fas fa-check"></i> Передать почту</button>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>Водитель</th><th>Транспорт</th><th>Емкостей</th><th>Накладные</th><th>Статус</th><th>Действия</th></tr></thead>
-                                <tbody id="driverTableBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Доставка почты -->
-                <div class="tab-content" id="back-delivery">
-                    <div class="sub-tabs-grid">
-                        <button class="sub-tab-btn active" data-subtab="delivery-postman"><i class="fas fa-walking"></i> Задание почтальона</button>
-                    </div>
-                    <div class="sub-tab-content active" id="delivery-postman">
-                        <div class="toolbar"><button class="btn btn-success btn-sm" onclick="openModal('postmanTaskModal')"><i class="fas fa-plus"></i> Создать задание</button></div>
-                        <div id="postmanTasksContainer"></div>
-                    </div>
-                </div>
-
-                <!-- Хранение РПО -->
-                <div class="tab-content" id="back-storage">
-                    <div class="sub-tabs-grid">
-                        <button class="sub-tab-btn active" data-subtab="storage-journal"><i class="fas fa-book"></i> Журнал РПО</button>
-                        <button class="sub-tab-btn" data-subtab="storage-address"><i class="fas fa-map-pin"></i> Места адресного хранения</button>
-                        <button class="sub-tab-btn" data-subtab="storage-return"><i class="fas fa-undo"></i> Отправление к возврату и досылу</button>
-                    </div>
-                    <div class="sub-tab-content active" id="storage-journal">
-                        <div class="search-form">
-                            <div class="form-row">
-                                <div class="form-group"><label>ШИ/ШПИ/ГИ отправления</label><input type="text" id="searchTrack" placeholder="Введите ШИ, ШПИ или ГИ..." value="TRK-2026-001"></div>
-                                <div class="form-group"><label>Получатель / Отправитель</label><input type="text" id="searchPerson" placeholder="ФИО..." value="Петров П.П."></div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group"><label>Дата операции (от)</label><input type="date" id="searchDateFrom" value="2026-06-01"></div>
-                                <div class="form-group"><label>Дата операции (до)</label><input type="date" id="searchDateTo" value="2026-06-30"></div>
-                            </div>
-                            <div class="form-group">
-                                <label>Статус отправления</label>
-                                <select id="searchStatus">
-                                    <option value="all">Все статусы</option>
-                                    <option value="Принято">Принято</option>
-                                    <option value="Сортировка">Сортировка</option>
-                                    <option value="В пути">В пути</option>
-                                    <option value="Вручено">Вручено</option>
-                                    <option value="Задерживается">Задерживается</option>
-                                </select>
-                            </div>
-                            <button class="btn btn-primary" style="width:100%;padding:12px;justify-content:center;" onclick="searchParcel()"><i class="fas fa-search"></i> Найти отправление</button>
-                            <div id="searchResult" class="search-result"></div>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>Трек</th><th>Получатель</th><th>Отправитель</th><th>Дата операции</th><th>Статус</th></tr></thead>
-                                <tbody id="storageJournalBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="storage-address">
-                        <div class="card-3d-wrapper" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));">
-    <div class="card-3d info" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-map-pin"></i></div>
-        <div>
-            <div class="card-label">Зона А</div>
-            <div class="card-value" id="zoneA" style="font-size:22px;">0</div>
-        </div>
-        <div class="card-footer-text">Ячеек занято</div>
-    </div>
-    <div class="card-3d success" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-map-pin"></i></div>
-        <div>
-            <div class="card-label">Зона Б</div>
-            <div class="card-value" id="zoneB" style="font-size:22px;">0</div>
-        </div>
-        <div class="card-footer-text">Ячеек занято</div>
-    </div>
-    <div class="card-3d warning" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-map-pin"></i></div>
-        <div>
-            <div class="card-label">Зона В</div>
-            <div class="card-value" id="zoneC" style="font-size:22px;">0</div>
-        </div>
-        <div class="card-footer-text">Ячеек занято</div>
-    </div>
-    <div class="card-3d accent" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-map-pin"></i></div>
-        <div>
-            <div class="card-label">Зона Г</div>
-            <div class="card-value" id="zoneD" style="font-size:22px;">0</div>
-        </div>
-        <div class="card-footer-text">Ячеек занято</div>
-    </div>
-</div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>Ячейка</th><th>Трек</th><th>Получатель</th><th>Срок хранения</th><th>Статус</th></tr></thead>
-                                <tbody id="addressStorageBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="sub-tab-content" id="storage-return">
-                        <div class="toolbar">
-                            <button class="btn btn-success btn-sm" onclick="openModal('returnModal')"><i class="fas fa-undo"></i> На возврат</button>
-                            <button class="btn btn-accent btn-sm" onclick="openModal('forwardModal')"><i class="fas fa-forward"></i> На досыл</button>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>Трек</th><th>Отправитель</th><th>Получатель</th><th>Операция</th><th>Действия</th></tr></thead>
-                                <tbody id="returnForwardBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+            <div class="form-row">
+                <div class="form-group"><label>Серия паспорта <span class="required">*</span></label><input type="text" id="reqPassportSeries" name="passport_series" placeholder="12 34" required></div>
+                <div class="form-group"><label>Номер паспорта <span class="required">*</span></label><input type="text" id="reqPassportNumber" name="passport_number" placeholder="567890" required></div>
             </div>
-        </div>
-
-        <!-- СТРАНИЦА: ОТЧЁТЫ -->
-        <div class="page-section active" id="page-reports">
-            <div class="tabs-container">
-                <div class="tabs-header">
-                    <button class="tab-btn active" data-tab="reports-cash"><i class="fas fa-cash-register"></i> Кассовые отчёты</button>
-                    <button class="tab-btn" data-tab="reports-general"><i class="fas fa-chart-bar"></i> Общие отчёты</button>
-                    <button class="tab-btn" data-tab="reports-postal"><i class="fas fa-envelope"></i> По почтовым услугам</button>
-                    <button class="tab-btn" data-tab="reports-goods"><i class="fas fa-boxes"></i> По товарам</button>
-                </div>
-
-                <!-- Кассовые отчёты -->
-                <div class="tab-content active" id="reports-cash">
-                    <div class="sub-tabs-grid">
-                        <button class="sub-tab-btn active" data-subtab="cash-money"><i class="fas fa-money-bill-wave"></i> Наличные деньги в кассе</button>
-                        <button class="sub-tab-btn" data-subtab="cash-spravka"><i class="fas fa-file-alt"></i> Кассовая справка МС-42</button>
-                    </div>
-                    <div class="sub-tab-content active" id="cash-money">
-                        <div class="card-3d-wrapper">
-    <div class="card-3d success" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-cash-register"></i></div>
-        <div>
-            <div class="card-label">Касса №1</div>
-            <div class="card-value" id="cash1">0 ₽</div>
-        </div>
-        <div class="card-footer-text">Остаток на конец дня</div>
-    </div>
-    
-    <div class="card-3d primary" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-cash-register"></i></div>
-        <div>
-            <div class="card-label">Касса №2</div>
-            <div class="card-value" id="cash2">0 ₽</div>
-        </div>
-        <div class="card-footer-text">Остаток на конец дня</div>
-    </div>
-    
-    <div class="card-3d accent" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-coins"></i></div>
-        <div>
-            <div class="card-label">Общая выручка</div>
-            <div class="card-value" id="cashTotal">0 ₽</div>
-        </div>
-        <div class="card-footer-text">За всё время</div>
-    </div>
-    
-    <div class="card-3d info" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-receipt"></i></div>
-        <div>
-            <div class="card-label">Операций за день</div>
-            <div class="card-value" id="cashOperations" style="font-size:26px;">0</div>
-        </div>
-        <div class="card-footer-text">Всего транзакций</div>
-    </div>
-</div>
-                        <div class="toolbar">
-    <button class="btn btn-primary btn-sm" onclick="printCashReport()"><i class="fas fa-print"></i> Печать</button>
-    <button class="btn btn-accent btn-sm" onclick="exportExcelCash()"><i class="fas fa-file-excel"></i> Excel</button>
-    <button class="btn btn-info btn-sm" onclick="exportWordCash()"><i class="fas fa-file-word"></i> Word</button>
-</div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>№</th><th>Оператор</th><th>Приход</th><th>Расход</th><th>Дата</th><th>Статус</th></tr></thead>
-                                <tbody id="cashReportBody"></tbody>
-                            </table>
-                        </div>
-                        <div id="cashReportResult" style="margin-top:16px;padding:16px;background:var(--gray-50);border-radius:var(--radius-sm);display:none;"></div>
-                    </div>
-                    <div class="sub-tab-content" id="cash-spravka">
-                        <div class="toolbar">
-    <button class="btn btn-primary btn-sm" onclick="generateMC42()"><i class="fas fa-file-alt"></i> Сформировать МС-42</button>
-    <button class="btn btn-accent btn-sm" onclick="printMC42()"><i class="fas fa-print"></i> Печать</button>
-    <span class="spacer"></span>
-    <input type="date" id="mc42Date" value="2026-06-20" style="width:180px;">
-</div>
-                        <div id="mc42Result">
-                            <div class="card">
-                                <div class="card-header"><h3><i class="fas fa-file-alt"></i> Кассовая справка МС-42</h3></div>
-                                <div class="card-body">
-                                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
-                                        <div style="background:var(--gray-50);padding:16px;border-radius:var(--radius-sm);text-align:center;">
-                                            <div style="font-size:11px;color:var(--gray-500);">Остаток на начало</div>
-                                            <div style="font-size:22px;font-weight:700;color:var(--primary);" id="mc42Start">0 ₽</div>
-                                        </div>
-                                        <div style="background:var(--gray-50);padding:16px;border-radius:var(--radius-sm);text-align:center;">
-                                            <div style="font-size:11px;color:var(--gray-500);">Приход</div>
-                                            <div style="font-size:22px;font-weight:700;color:var(--success);" id="mc42Income">0 ₽</div>
-                                        </div>
-                                        <div style="background:var(--gray-50);padding:16px;border-radius:var(--radius-sm);text-align:center;">
-                                            <div style="font-size:11px;color:var(--gray-500);">Остаток на конец</div>
-                                            <div style="font-size:22px;font-weight:700;color:var(--accent);" id="mc42End">0 ₽</div>
-                                        </div>
-                                    </div>
-                                    <div style="margin-top:16px;padding:16px;background:var(--gray-100);border-radius:var(--radius-sm);font-size:13px;">
-                                        <p><strong>Документ:</strong> Кассовая справка МС-42 №124 от <span id="mc42DateDisplay">2026-06-20</span></p>
-                                        <p><strong>Смена:</strong> №124 · Кассир: Иванов И.И.</p>
-                                        <p><strong>Подпись:</strong> ___________________</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Общие отчёты -->
-                <div class="tab-content" id="reports-general">
-                    <div class="sub-tabs-grid">
-                        <button class="sub-tab-btn active" data-subtab="general-2ap"><i class="fas fa-file-alt"></i> Отчёт ф.2а-п</button>
-                    </div>
-                    <div class="sub-tab-content active" id="general-2ap">
-                        <div class="toolbar">
-    <button class="btn btn-primary btn-sm" onclick="generateReport2ap()"><i class="fas fa-file-alt"></i> Сформировать</button>
-    <button class="btn btn-accent btn-sm" onclick="printReport2ap()"><i class="fas fa-print"></i> Печать</button>
-    <span class="spacer"></span>
-    <input type="date" id="report2apFrom" value="2026-06-01" style="width:160px;">
-    <input type="date" id="report2apTo" value="2026-06-30" style="width:160px;">
-</div>
-                        <div id="report2apResult">
-                            <div class="card">
-                                <div class="card-header"><h3><i class="fas fa-newspaper"></i> Отчёт ф.2а-п — поступление и отправка</h3></div>
-                                <div class="card-body">
-                                    <div class="card-3d-wrapper" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));">
-    <div class="card-3d success" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-envelope"></i></div>
-        <div>
-            <div class="card-label">Поступило писем</div>
-            <div class="card-value" id="report2apInLetters" style="font-size:22px;">0</div>
-        </div>
-        <div class="card-footer-text">За период</div>
-    </div>
-    <div class="card-3d accent" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-envelope-open"></i></div>
-        <div>
-            <div class="card-label">Отправлено писем</div>
-            <div class="card-value" id="report2apOutLetters" style="font-size:22px;">0</div>
-        </div>
-        <div class="card-footer-text">За период</div>
-    </div>
-    <div class="card-3d info" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-newspaper"></i></div>
-        <div>
-            <div class="card-label">Поступило газет</div>
-            <div class="card-value" id="report2apInNewspapers" style="font-size:22px;">0</div>
-        </div>
-        <div class="card-footer-text">За период</div>
-    </div>
-    <div class="card-3d emerald" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-newspaper"></i></div>
-        <div>
-            <div class="card-label">Отправлено газет</div>
-            <div class="card-value" id="report2apOutNewspapers" style="font-size:22px;">0</div>
-        </div>
-        <div class="card-footer-text">За период</div>
-    </div>
-    <div class="card-3d purple" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-box"></i></div>
-        <div>
-            <div class="card-label">Поступило посылок</div>
-            <div class="card-value" id="report2apInParcels" style="font-size:22px;">0</div>
-        </div>
-        <div class="card-footer-text">За период</div>
-    </div>
-    <div class="card-3d teal" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-box"></i></div>
-        <div>
-            <div class="card-label">Отправлено посылок</div>
-            <div class="card-value" id="report2apOutParcels" style="font-size:22px;">0</div>
-        </div>
-        <div class="card-footer-text">За период</div>
-    </div>
-</div>
-                                    <div class="table-responsive">
-                                        <table class="data-table">
-                                            <thead><tr><th>Дата</th><th>Поступило</th><th>Отправлено</th><th>Тип</th></tr></thead>
-                                            <tbody id="report2apTableBody"></tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- По почтовым услугам -->
-                <div class="tab-content" id="reports-postal">
-                    <div class="sub-tabs-grid">
-                        <button class="sub-tab-btn active" data-subtab="postal-rpo"><i class="fas fa-box"></i> Отчёт по движению РПО</button>
-                        <button class="sub-tab-btn" data-subtab="postal-journal"><i class="fas fa-book"></i> Журнал операций</button>
-                    </div>
-                    
-                    <!-- ОТЧЁТ ПО ДВИЖЕНИЮ РПО -->
-                    <div class="sub-tab-content active" id="postal-rpo">
-                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;padding:12px 16px;background:var(--gray-50);border-radius:var(--radius-sm);border:1px solid var(--gray-200);">
-                            <div>
-                                <span style="font-size:13px;color:var(--gray-500);">Данные актуальны на</span>
-                                <span style="font-weight:600;font-size:14px;color:var(--primary);" id="rpoReportDate">17:14, 24.08.2026 г.</span>
-                            </div>
-                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                                <button class="btn btn-success btn-sm" onclick="exportRPOExcel()"><i class="fas fa-file-excel"></i> Выгрузить в Excel</button>
-                                <button class="btn btn-accent btn-sm" onclick="printRPOReport()"><i class="fas fa-print"></i> Распечатать отчёт</button>
-                                <button class="btn btn-primary btn-sm" onclick="refreshRPOTable()"><i class="fas fa-sync"></i> Обновить</button>
-                            </div>
-                        </div>
-                        
-                        <div class="table-responsive" style="margin-top:12px;">
-                            <table class="data-table" id="rpoMovementTable" style="font-size:11px;">
-    <thead>
-        <tr>
-            <th rowspan="2" style="font-size:10px;padding:4px 6px;">Вид</th>
-            <th colspan="3" style="text-align:center;font-size:10px;padding:4px 6px;">Остаток на начало дня</th>
-            <th rowspan="2" style="font-size:10px;padding:4px 6px;">Поступило</th>
-            <th rowspan="2" style="font-size:10px;padding:4px 6px;">Вручено</th>
-            <th rowspan="2" style="font-size:10px;padding:4px 6px;">Утрачено/<br>Изъято</th>
-            <th rowspan="2" style="font-size:10px;padding:4px 6px;">Дослано/<br>Возвращено</th>
-            <th colspan="3" style="text-align:center;font-size:10px;padding:4px 6px;">Остаток на конец дня</th>
-        </tr>
-        <tr>
-            <th style="font-size:9px;padding:3px 4px;">На хранении в ОПС</th>
-            <th style="font-size:9px;padding:3px 4px;">В доставке</th>
-            <th style="font-size:9px;padding:3px 4px;">Итого</th>
-            <th style="font-size:9px;padding:3px 4px;">На хранении в ОПС</th>
-            <th style="font-size:9px;padding:3px 4px;">В доставке</th>
-            <th style="font-size:9px;padding:3px 4px;">Итого</th>
-        </tr>
-    </thead>
-    <tbody id="rpoMovementBody"></tbody>
-</table>
-                        </div>
-                    </div>
-
-                    <!-- ЖУРНАЛ ОПЕРАЦИЙ -->
-                    <div class="sub-tab-content" id="postal-journal">
-                        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;padding:12px 16px;background:var(--gray-50);border-radius:var(--radius-sm);border:1px solid var(--gray-200);align-items:center;">
-                            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-                                <input type="text" id="journalSearch" placeholder="🔍 Поиск..." style="padding:7px 12px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);font-size:13px;width:160px;">
-                                <input type="date" id="journalDateFrom" style="padding:7px 12px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);font-size:13px;width:140px;">
-                                <span style="font-size:13px;color:var(--gray-500);">—</span>
-                                <input type="date" id="journalDateTo" style="padding:7px 12px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);font-size:13px;width:140px;">
-                                <input type="text" id="journalFd" placeholder="Номер ФД" style="padding:7px 12px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);font-size:13px;width:140px;">
-                                <input type="text" id="journalCheck" placeholder="Номер чека" style="padding:7px 12px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);font-size:13px;width:140px;">
-                                <select id="journalWindow" style="padding:7px 12px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);font-size:13px;">
-                                    <option value="">Все окна</option>
-                                    <option value="Окно 01">Окно 01</option>
-                                    <option value="Окно 02">Окно 02</option>
-                                    <option value="Окно 03">Окно 03</option>
-                                </select>
-                                <button class="btn btn-primary btn-sm" onclick="filterJournal()"><i class="fas fa-filter"></i> Отфильтровать</button>
-                                <button class="btn btn-outline btn-sm" onclick="resetJournalFilters()"><i class="fas fa-undo"></i> Сбросить</button>
-                            </div>
-                            <div style="display:flex;gap:6px;margin-left:auto;">
-                                <button class="btn btn-success btn-sm" onclick="exportJournalExcel()"><i class="fas fa-file-excel"></i> Excel</button>
-                                <button class="btn btn-accent btn-sm" onclick="printJournal()"><i class="fas fa-print"></i> Печать</button>
-                            </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="data-table" id="journalTable">
-                                <thead>
-                                    <tr>
-                                        <th>Дата</th>
-                                        <th>Время</th>
-                                        <th>Номер окна</th>
-                                        <th>Пользователь</th>
-                                        <th>Номер чека</th>
-                                        <th>Номер ФД</th>
-                                        <th>Сумма (₽)</th>
-                                        <th>Статус</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="journalBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- По товарам -->
-                <div class="tab-content" id="reports-goods">
-                    <div class="sub-tabs-grid">
-                        <button class="sub-tab-btn active" data-subtab="goods-movement"><i class="fas fa-arrow-right"></i> Отчёт по движению ТМЦ</button>
-                    </div>
-                    <div class="sub-tab-content active" id="goods-movement">
-                        <div class="toolbar">
-    <button class="btn btn-primary btn-sm" onclick="generateGoodsReport()"><i class="fas fa-file-alt"></i> Сформировать</button>
-    <button class="btn btn-accent btn-sm" onclick="printGoodsReport()"><i class="fas fa-print"></i> Печать</button>
-    <span class="spacer"></span>
-    <input type="date" id="goodsReportFrom" value="2026-06-01" style="width:160px;">
-    <input type="date" id="goodsReportTo" value="2026-06-30" style="width:160px;">
-</div>
-                        <div id="goodsReportResult">
-                            <div class="report-cards">
-                                <div class="report-card"><i class="fas fa-box"></i><h4>Остаток на начало</h4><p id="goodsStartBalance">0 шт.</p></div>
-                                <div class="report-card" style="border-color:var(--success);"><i class="fas fa-arrow-down" style="color:var(--success);"></i><h4>Поступило</h4><p id="goodsIncome">0 шт.</p></div>
-                                <div class="report-card" style="border-color:var(--danger);"><i class="fas fa-arrow-up" style="color:var(--danger);"></i><h4>Продано</h4><p id="goodsOutcome">0 шт.</p></div>
-                                <div class="report-card" style="border-color:var(--accent);"><i class="fas fa-boxes" style="color:var(--accent);"></i><h4>Остаток на конец</h4><p id="goodsEndBalance">0 шт.</p></div>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="data-table">
-                                    <thead><tr><th>Артикул</th><th>Наименование</th><th>Приход</th><th>Расход</th><th>Остаток</th></tr></thead>
-                                    <tbody id="goodsReportTableBody"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="form-row">
+                <div class="form-group"><label>Email <span class="required">*</span></label><input type="email" id="reqEmail" name="_replyto" placeholder="your@email.com" required></div>
+                <div class="form-group"><label>Отделение / Подразделение</label><input type="text" id="reqDepartment" name="department" placeholder="Отделение №1, г. Москва"></div>
             </div>
+            <input type="hidden" name="_subject" value="Новая заявка на доступ к АРМ">
+            <input type="hidden" name="_captcha" value="false">
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="closeModal('requestModal')">Отмена</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Отправить заявку</button>
+            </div>
+        </form>
+        <div class="request-success" id="requestSuccess">
+            <i class="fas fa-check-circle"></i>
+            <h4>Заявка отправлена!</h4>
+            <p>Администратор рассмотрит вашу заявку и вышлет ключ доступа на указанный email в ближайшее время.</p>
+            <button class="btn btn-primary" style="margin-top:12px;" onclick="closeModal('requestModal')">Закрыть</button>
         </div>
-
-        <!-- СТРАНИЦА: СЛУЖЕБНЫЕ ОПЕРАЦИИ -->
-        <div class="page-section" id="page-service">
-            <div class="tabs-container">
-                <div class="tabs-header">
-                    <button class="tab-btn active" data-tab="service-cash"><i class="fas fa-cash-register"></i> Кассовые операции</button>
-                </div>
-                <div class="tab-content active" id="service-cash">
-                    <div class="card-3d-wrapper">
-    <div class="card-3d emerald" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-cash-register"></i></div>
-        <div>
-            <div class="card-label">Касса №1</div>
-            <div class="card-value" id="serviceCash1">0 ₽</div>
-        </div>
-        <div class="card-footer-text">Текущий остаток</div>
-    </div>
-    <div class="card-3d cyan" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-cash-register"></i></div>
-        <div>
-            <div class="card-label">Касса №2</div>
-            <div class="card-value" id="serviceCash2">0 ₽</div>
-        </div>
-        <div class="card-footer-text">Текущий остаток</div>
-    </div>
-    <div class="card-3d amber" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-clock"></i></div>
-        <div>
-            <div class="card-label">Смена №</div>
-            <div class="card-value" id="serviceShift" style="font-size:26px;">#0</div>
-        </div>
-        <div class="card-footer-text">Текущая смена</div>
-    </div>
-    <div class="card-3d rose" data-tilt>
-        <div class="card-glow"></div>
-        <div class="card-icon"><i class="fas fa-info-circle"></i></div>
-        <div>
-            <div class="card-label">Статус</div>
-            <div class="card-value" id="serviceStatus" style="font-size:20px;">Закрыта</div>
-        </div>
-        <div class="card-footer-text">Состояние кассы</div>
     </div>
 </div>
+
+<!-- ======= БОКОВОЕ МЕНЮ ======= -->
+<nav id="sidebar">
+    <div class="brand"><i class="fas fa-envelope"></i><div><span></span><small>Почта России</small></div></div>
+    <div class="user-info">
+        <div class="avatar" id="avatarLetter">С</div>
+        <div><div class="uname" id="displayName">Сотрудник</div><div class="urole" id="displayRole">Сотрудник отделения</div></div>
+    </div>
+    <ul class="nav-menu">
+        <li class="nav-label">Основные модули</li>
+        <li><a data-page="front"><i class="fas fa-store-alt"></i> Фронт-зона</a></li>
+        <li><a data-page="back"><i class="fas fa-warehouse"></i> Бэк-зона</a></li>
+        <li><a class="active" data-page="reports"><i class="fas fa-chart-pie"></i> Отчёты</a></li>
+        <li><a data-page="service"><i class="fas fa-cogs"></i> Служебные операции</a></li>
+        <li class="nav-label">Коммуникации</li>
+        <li><a data-page="support" class="feedback-link"><i class="fas fa-headset"></i> Обратная связь</a></li>
+    </ul>
+    <div class="sidebar-footer">
+        <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+    </div>
+</nav>
+
+<!-- ======= ОСНОВНОЙ КОНТЕНТ ======= -->
+<div id="mainContent">
+    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i> Меню</button>
+
+    <!-- СТРАНИЦА: ФРОНТ-ЗОНА -->
+    <div class="page-section" id="page-front">
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="front-reception"><i class="fas fa-inbox"></i> Приём</button>
+                <button class="tab-btn" data-tab="front-goods"><i class="fas fa-boxes"></i> Товары</button>
+                <button class="tab-btn" data-tab="front-delivery"><i class="fas fa-hand-holding-heart"></i> Вручение</button>
+                <button class="tab-btn" data-tab="front-commercial"><i class="fas fa-shopping-bag"></i> Коммерческие услуги</button>
+                <button class="tab-btn" data-tab="front-payments"><i class="fas fa-credit-card"></i> Платежи и выплаты</button>
+                <button class="tab-btn" data-tab="front-cards"><i class="fas fa-id-card"></i> Операции с картой</button>
+            </div>
+
+            <!-- Приём -->
+            <div class="tab-content active" id="front-reception">
+                <div class="sub-tabs-grid">
+                    <button class="sub-tab-btn active" data-subtab="reception-simple"><i class="fas fa-arrow-right"></i> Упрощённый приём</button>
+                    <button class="sub-tab-btn" data-subtab="reception-rpo"><i class="fas fa-qrcode"></i> Приём РПО</button>
+                    <button class="sub-tab-btn" data-subtab="reception-extra"><i class="fas fa-plus-circle"></i> Доп. услуги</button>
+                </div>
+                
+                <!-- Упрощённый приём -->
+                <div class="sub-tab-content active" id="reception-simple">
                     <div class="toolbar">
-                        <button class="btn btn-success btn-sm" onclick="openShift()"><i class="fas fa-play"></i> Открыть смену</button>
-                        <button class="btn btn-danger btn-sm" onclick="closeShift()"><i class="fas fa-stop"></i> Закрыть смену</button>
-                        <button class="btn btn-accent btn-sm" onclick="processCollection()"><i class="fas fa-cash-register"></i> Инкассация</button>
+                        <button class="btn btn-success btn-sm" onclick="openModal('parcelModal')"><i class="fas fa-plus"></i> Принять</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('parcelsTableBody', 'Приём_отправлений')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('parcelsTableBody', 'Приём_отправлений')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                        <input type="text" id="parcelSearch" placeholder="🔍 Поиск по треку..." oninput="renderParcels()" style="width:200px;">
                     </div>
                     <div class="table-responsive">
                         <table class="data-table">
-                            <thead><tr><th>№</th><th>Оператор</th><th>Приход</th><th>Расход</th><th>Дата</th><th>Статус</th></tr></thead>
-                            <tbody id="serviceCashBody"></tbody>
+                            <thead><tr><th>Трек</th><th>Отправитель</th><th>Получатель</th><th>Тип</th><th>Вес</th><th>Статус</th><th>Действия</th></tr></thead>
+                            <tbody id="parcelsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Приём РПО -->
+                <div class="sub-tab-content" id="reception-rpo">
+                    <div class="toolbar">
+                        <button class="btn btn-success btn-sm" onclick="openModal('rpoModal')"><i class="fas fa-plus"></i> Добавить РПО</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('rpoTableBody', 'Приём_РПО')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('rpoTableBody', 'Приём_РПО')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>Трек</th><th>Тип РПО</th><th>Отправитель</th><th>Получатель</th><th>Вес (г)</th><th>Ценность</th><th>Стоимость</th><th>Статус</th></tr></thead>
+                            <tbody id="rpoTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Доп. услуги -->
+                <div class="sub-tab-content" id="reception-extra">
+                    <div class="toolbar">
+                        <button class="btn btn-success btn-sm" onclick="openModal('extraServiceModal')"><i class="fas fa-plus"></i> Добавить услугу</button>
+                        <button class="btn btn-accent btn-sm" onclick="addExtraToCart()"><i class="fas fa-shopping-cart"></i> В корзину</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('extraServicesBody', 'Доп_услуги')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('extraServicesBody', 'Доп_услуги')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                        <span style="font-size:13px;color:var(--gray-500);">Выберите услугу для добавления в заказ</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>ID</th><th>Услуга</th><th>Цена (₽)</th><th>Описание</th><th>Действия</th></tr></thead>
+                            <tbody id="extraServicesBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="extraServiceCartInfo" style="margin-top:12px;padding:12px;background:var(--gray-50);border-radius:var(--radius-sm);display:none;">
+                        <span style="font-weight:600;">Услуги в корзине:</span>
+                        <span id="extraCartCount">0</span> услуг на сумму <span id="extraCartTotal">0</span> ₽
+                    </div>
+                </div>
+            </div>
+
+            <!-- Товары -->
+            <div class="tab-content" id="front-goods">
+                <div class="sub-tabs-grid">
+                    <button class="sub-tab-btn active" data-subtab="goods-sale"><i class="fas fa-shopping-cart"></i> Продажа ТМЦ</button>
+                    <button class="sub-tab-btn" data-subtab="goods-stock"><i class="fas fa-archive"></i> Остатки ТМЦ</button>
+                    <button class="sub-tab-btn" data-subtab="goods-receipt"><i class="fas fa-arrow-down"></i> Приход</button>
+                    <button class="sub-tab-btn" data-subtab="goods-writeoff"><i class="fas fa-trash-alt"></i> Списание</button>
+                    <button class="sub-tab-btn" data-subtab="goods-move"><i class="fas fa-arrows-alt-h"></i> Перемещение</button>
+                    <button class="sub-tab-btn" data-subtab="goods-inventory"><i class="fas fa-clipboard-list"></i> Инвентаризация</button>
+                    <button class="sub-tab-btn" data-subtab="goods-return"><i class="fas fa-undo"></i> Возврат</button>
+                    <button class="sub-tab-btn" data-subtab="goods-util"><i class="fas fa-recycle"></i> Утилизация</button>
+                </div>
+                
+                <!-- Продажа ТМЦ -->
+                <div class="sub-tab-content active" id="goods-sale">
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="filterGoods('all')">Все товары</button>
+                        <button class="filter-btn" onclick="filterGoods('openki')">Открытки</button>
+                        <button class="filter-btn" onclick="filterGoods('calendars')">Календари</button>
+                        <button class="filter-btn" onclick="filterGoods('konverty')">Конверты</button>
+                        <button class="filter-btn" onclick="filterGoods('upakovka')">Упаковка</button>
+                        <button class="filter-btn" onclick="filterGoods('hoztovary')">Хоз. товары</button>
+                        <button class="filter-btn" onclick="filterGoods('electronics')">Электроника</button>
+                        <button class="filter-btn" onclick="filterGoods('food')">Питание</button>
+                    </div>
+                    <div class="toolbar">
+                        <button class="btn btn-success btn-sm" onclick="openModal('productModal')"><i class="fas fa-plus"></i> Добавить товар</button>
+                        <button class="btn btn-accent btn-sm" onclick="addToCartFromGoods()"><i class="fas fa-shopping-cart"></i> В корзину</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('goodsTableBody', 'Товары')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('goodsTableBody', 'Товары')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                        <input type="text" id="goodsSearch" placeholder="🔍 Поиск товара..." oninput="renderGoods()" style="width:180px;">
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>Артикул</th><th>Наименование</th><th>Категория</th><th>Кол-во</th><th>Цена</th><th>Сумма</th><th>Статус</th><th>Действия</th></tr></thead>
+                            <tbody id="goodsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Остатки ТМЦ -->
+                <div class="sub-tab-content" id="goods-stock">
+                    <div class="toolbar" style="margin-bottom:12px;">
+                        <span style="font-size:13px;color:var(--gray-500);">Остатки товаров на складах</span>
+                        <button class="btn btn-primary btn-sm" onclick="refreshStock()"><i class="fas fa-sync"></i> Обновить</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('goodsStockBody', 'Остатки_ТМЦ')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('goodsStockBody', 'Остатки_ТМЦ')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>ID</th><th>Наименование</th><th>Категория</th><th>Остаток (шт.)</th><th>Склад</th><th>Стоимость (₽)</th></tr></thead>
+                            <tbody id="goodsStockBody"></tbody>
+                            <tfoot id="goodsStockFooter"></tfoot>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Приход ТМЦ -->
+                <div class="sub-tab-content" id="goods-receipt">
+                    <div class="toolbar">
+                        <button class="btn btn-success btn-sm" onclick="openModal('goodsReceiptModal')"><i class="fas fa-plus"></i> Оприходовать</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('goodsReceiptBody', 'Приход_ТМЦ')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('goodsReceiptBody', 'Приход_ТМЦ')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№</th><th>Товар</th><th>Категория</th><th>Кол-во</th><th>Цена</th><th>Дата</th><th>Принял</th></tr></thead>
+                            <tbody id="goodsReceiptBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Списание ТМЦ -->
+                <div class="sub-tab-content" id="goods-writeoff">
+                    <div class="toolbar">
+                        <button class="btn btn-danger btn-sm" onclick="openModal('goodsWriteoffModal')"><i class="fas fa-plus"></i> Списать</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('goodsWriteoffBody', 'Списание_ТМЦ')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('goodsWriteoffBody', 'Списание_ТМЦ')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№</th><th>Товар</th><th>Категория</th><th>Кол-во</th><th>Дата</th><th>Ответственный</th></tr></thead>
+                            <tbody id="goodsWriteoffBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Перемещение ТМЦ -->
+                <div class="sub-tab-content" id="goods-move">
+                    <div class="toolbar">
+                        <button class="btn btn-accent btn-sm" onclick="openModal('goodsMoveModal')"><i class="fas fa-plus"></i> Переместить</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('goodsMoveBody', 'Перемещение_ТМЦ')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('goodsMoveBody', 'Перемещение_ТМЦ')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№</th><th>Товар</th><th>Откуда</th><th>Куда</th><th>Кол-во</th><th>Дата</th></tr></thead>
+                            <tbody id="goodsMoveBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Инвентаризация -->
+                <div class="sub-tab-content" id="goods-inventory">
+                    <div class="toolbar">
+                        <button class="btn btn-primary btn-sm" onclick="startInventory()"><i class="fas fa-play"></i> Начать инвентаризацию</button>
+                    </div>
+                    <div id="inventoryResult" style="padding:16px;background:var(--gray-50);border-radius:var(--radius-sm);margin-top:12px;">
+                        <p class="text-muted"><i class="fas fa-info-circle"></i> Инвентаризация не запущена. Нажмите "Начать инвентаризацию".</p>
+                    </div>
+                </div>
+                
+                <!-- Возврат ТМЦ -->
+                <div class="sub-tab-content" id="goods-return">
+                    <div class="toolbar">
+                        <button class="btn btn-warning btn-sm" onclick="openModal('goodsReturnModal')"><i class="fas fa-plus"></i> Оформить возврат</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('goodsReturnBody', 'Возврат_ТМЦ')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('goodsReturnBody', 'Возврат_ТМЦ')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№</th><th>Товар</th><th>Клиент</th><th>Сумма</th><th>Дата</th><th>Статус</th></tr></thead>
+                            <tbody id="goodsReturnBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Утилизация ТМЦ -->
+                <div class="sub-tab-content" id="goods-util">
+                    <div class="toolbar">
+                        <button class="btn btn-danger btn-sm" onclick="openModal('goodsUtilModal')"><i class="fas fa-plus"></i> Утилизировать</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('goodsUtilBody', 'Утилизация_ТМЦ')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('goodsUtilBody', 'Утилизация_ТМЦ')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№</th><th>Товар</th><th>Кол-во</th><th>Дата</th><th>Ответственный</th></tr></thead>
+                            <tbody id="goodsUtilBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вручение -->
+            <div class="tab-content" id="front-delivery">
+                <div class="sub-tabs-grid">
+                    <button class="sub-tab-btn active" data-subtab="delivery-main"><i class="fas fa-hand-holding-heart"></i> Вручение РПО</button>
+                    <button class="sub-tab-btn" data-subtab="delivery-return"><i class="fas fa-undo-alt"></i> Возврат</button>
+                </div>
+                
+                <!-- Вручение РПО -->
+                <div class="sub-tab-content active" id="delivery-main">
+                    <div class="toolbar">
+                        <button class="btn btn-accent btn-sm" onclick="openModal('deliveryModal')"><i class="fas fa-hand-holding-heart"></i> Вручить</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('deliveryBody', 'Вручение_РПО')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('deliveryBody', 'Вручение_РПО')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                        <input type="text" id="deliverySearch" placeholder="🔍 Поиск по треку..." oninput="renderDelivery()" style="width:200px;">
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>Трек</th><th>Получатель</th><th>Отправитель</th><th>Тип</th><th>Статус</th><th>Дата</th><th>Действия</th></tr></thead>
+                            <tbody id="deliveryBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Возврат вручения -->
+                <div class="sub-tab-content" id="delivery-return">
+                    <div class="toolbar">
+                        <button class="btn btn-warning btn-sm" onclick="openModal('deliveryReturnModal')"><i class="fas fa-plus"></i> Оформить возврат</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('deliveryReturnBody', 'Возврат_вручения')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('deliveryReturnBody', 'Возврат_вручения')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>Трек</th><th>Отправитель</th><th>Получатель</th><th>Адрес отправителя</th><th>Адрес получателя</th><th>Дата возврата</th><th>Статус</th></tr></thead>
+                            <tbody id="deliveryReturnBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Коммерческие услуги -->
+            <div class="tab-content" id="front-commercial">
+                <div class="sub-tabs-grid">
+                    <button class="sub-tab-btn active" data-subtab="commercial-lottery"><i class="fas fa-ticket-alt"></i> Национальные лотереи</button>
+                    <button class="sub-tab-btn" data-subtab="commercial-insurance"><i class="fas fa-shield-alt"></i> Страховки АРФУ</button>
+                    <button class="sub-tab-btn" data-subtab="commercial-sim"><i class="fas fa-sim-card"></i> Продажа SIM-карт</button>
+                    <button class="sub-tab-btn" data-subtab="commercial-digital"><i class="fas fa-mobile-alt"></i> Цифровые сервисы</button>
+                    <button class="sub-tab-btn" data-subtab="commercial-telegram"><i class="fas fa-telegram"></i> Приём телеграмм</button>
+                    <button class="sub-tab-btn" data-subtab="commercial-copy"><i class="fas fa-copy"></i> Ксерокопии</button>
+                </div>
+                
+                <!-- Лотереи -->
+                <div class="sub-tab-content active" id="commercial-lottery">
+                    <div class="lottery-actions">
+                        <button class="lottery-btn" onclick="openModal('lotterySaleModal')"><i class="fas fa-ticket-alt"></i> Реализация лотерей</button>
+                        <button class="lottery-btn" onclick="openModal('lotteryPayModal')"><i class="fas fa-money-bill-wave"></i> Выплата</button>
+                        <button class="lottery-btn" onclick="generateLotteryReport()"><i class="fas fa-chart-bar"></i> Отчёты</button>
+                        <button class="lottery-btn" onclick="openModal('lotterySettingsModal')"><i class="fas fa-sliders-h"></i> Настройки</button>
+                    </div>
+                    <div id="lotteryReport" style="margin-top:12px;"></div>
+                    <div class="toolbar">
+                        <button class="btn btn-primary btn-sm" onclick="printTable('lotteryBody', 'Лотереи')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('lotteryBody', 'Лотереи')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№ билета</th><th>Клиент</th><th>Сумма</th><th>Дата</th><th>Статус</th></tr></thead>
+                            <tbody id="lotteryBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Страховки -->
+                <div class="sub-tab-content" id="commercial-insurance">
+                    <div class="toolbar">
+                        <button class="btn btn-success btn-sm" onclick="openModal('insuranceModal')"><i class="fas fa-plus"></i> Оформить страховку</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('insuranceBody', 'Страховки')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('insuranceBody', 'Страховки')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№ полиса</th><th>Клиент</th><th>Паспорт</th><th>Дата рождения</th><th>Сумма</th><th>Дата</th><th>Статус</th></tr></thead>
+                            <tbody id="insuranceBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- SIM-карты -->
+                <div class="sub-tab-content" id="commercial-sim">
+                    <div class="toolbar">
+                        <button class="btn btn-success btn-sm" onclick="openModal('simModal')"><i class="fas fa-plus"></i> Активировать SIM</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('simBody', 'SIM_карты')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('simBody', 'SIM_карты')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№ SIM</th><th>Номер</th><th>Оператор</th><th>Тариф</th><th>Статус</th></tr></thead>
+                            <tbody id="simBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Цифровые сервисы -->
+                <div class="sub-tab-content" id="commercial-digital">
+                    <div class="toolbar">
+                        <button class="btn btn-accent btn-sm" onclick="openModal('digitalModal')"><i class="fas fa-plus"></i> Подключить сервис</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('digitalBody', 'Цифровые_сервисы')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('digitalBody', 'Цифровые_сервисы')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>Услуга</th><th>Клиент</th><th>Цена</th><th>Дата</th><th>Статус</th></tr></thead>
+                            <tbody id="digitalBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Телеграммы -->
+                <div class="sub-tab-content" id="commercial-telegram">
+                    <div class="toolbar">
+                        <button class="btn btn-accent btn-sm" onclick="openModal('telegramModal')"><i class="fas fa-plus"></i> Принять телеграмму</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('telegramBody', 'Телеграммы')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('telegramBody', 'Телеграммы')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№</th><th>Отправитель</th><th>Адрес отправителя</th><th>Получатель</th><th>Адрес получателя</th><th>Текст</th><th>Слов</th><th>Стоимость</th><th>Дата</th><th>Статус</th></tr></thead>
+                            <tbody id="telegramBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Ксерокопии -->
+                <div class="sub-tab-content" id="commercial-copy">
+                    <div class="toolbar">
+                        <button class="btn btn-accent btn-sm" onclick="openModal('copyModal')"><i class="fas fa-plus"></i> Новая копия</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('copyBody', 'Ксерокопии')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('copyBody', 'Ксерокопии')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                        <select style="padding:7px 14px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);">
+                            <option>Ч/б копия</option>
+                            <option>Цветная копия</option>
+                            <option>Скан</option>
+                            <option>Распечатка</option>
+                        </select>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№</th><th>Клиент</th><th>Тип</th><th>Кол-во</th><th>Стоимость</th><th>Дата</th></tr></thead>
+                            <tbody id="copyBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Платежи и выплаты -->
+            <div class="tab-content" id="front-payments">
+                <div class="sub-tabs-grid">
+                    <button class="sub-tab-btn active" data-subtab="payments-pension"><i class="fas fa-piggy-bank"></i> Пенсия и пособия</button>
+                    <button class="sub-tab-btn" data-subtab="payments-city"><i class="fas fa-city"></i> Система Город</button>
+                    <button class="sub-tab-btn" data-subtab="payments-utility"><i class="fas fa-home"></i> Коммунальные платежи</button>
+                </div>
+                
+                <!-- Пенсия -->
+                <div class="sub-tab-content active" id="payments-pension">
+                    <div class="toolbar">
+                        <button class="btn btn-success btn-sm" onclick="openModal('pensionModal')"><i class="fas fa-plus"></i> Назначить выплату</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('pensionBody', 'Пенсии_и_пособия')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('pensionBody', 'Пенсии_и_пособия')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№</th><th>ФИО</th><th>СНИЛС</th><th>Сумма</th><th>Тип</th><th>Дата</th><th>Статус</th></tr></thead>
+                            <tbody id="pensionBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Система Город -->
+                <div class="sub-tab-content" id="payments-city">
+                    <div class="quick-payments">
+                        <button class="qp-btn" onclick="openModal('paymentPhoneModal')"><i class="fas fa-phone"></i> Телефон</button>
+                        <button class="qp-btn" onclick="openModal('paymentTrashModal')"><i class="fas fa-trash-alt"></i> Мусор</button>
+                        <button class="qp-btn" onclick="openModal('paymentFineModal')"><i class="fas fa-gavel"></i> Штрафы</button>
+                        <button class="qp-btn" onclick="openModal('paymentTaxModal')"><i class="fas fa-landmark"></i> Налоги</button>
+                    </div>
+                    <div class="catalog-actions" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin:16px 0;">
+                        <button class="btn btn-primary" style="padding:16px;justify-content:center;" onclick="openModal('paymentServiceModal')"><i class="fas fa-hand-holding-usd"></i> Оплата услуг</button>
+                        <button class="btn btn-danger" style="padding:16px;justify-content:center;" onclick="openModal('paymentCreditModal')"><i class="fas fa-university"></i> Погашение кредитов</button>
+                        <button class="btn btn-info" style="padding:16px;justify-content:center;" onclick="openModal('paymentHistoryModal')"><i class="fas fa-history"></i> История платежей</button>
+                    </div>
+                    <div class="toolbar">
+                        <button class="btn btn-primary btn-sm" onclick="printTable('cityPaymentsBody', 'Система_Город')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('cityPaymentsBody', 'Система_Город')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№</th><th>Плательщик</th><th>Услуга</th><th>Сумма</th><th>Дата</th><th>Статус</th></tr></thead>
+                            <tbody id="cityPaymentsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Коммунальные платежи -->
+                <div class="sub-tab-content" id="payments-utility">
+                    <div style="max-width:500px;margin:0 auto;padding:24px;background:var(--gray-50);border-radius:var(--radius-sm);border:1px solid var(--gray-200);">
+                        <h4 style="color:var(--primary);margin-bottom:16px;"><i class="fas fa-home"></i> Оплата коммунальных услуг</h4>
+                        <div class="form-group">
+                            <label>Лицевой счёт <span class="required">*</span></label>
+                            <input type="text" id="utilityAccount" placeholder="Введите номер лицевого счёта" style="width:100%;padding:10px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);">
+                        </div>
+                        <div class="form-group">
+                            <label>ФИО плательщика <span class="required">*</span></label>
+                            <input type="text" id="utilityPayer" placeholder="Иванов Иван Иванович" style="width:100%;padding:10px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);">
+                        </div>
+                        <div class="form-group">
+                            <label>Услуга</label>
+                            <select id="utilityService" style="width:100%;padding:10px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);">
+                                <option value="Электроэнергия">Электроэнергия</option>
+                                <option value="Водоснабжение">Водоснабжение</option>
+                                <option value="Газ">Газ</option>
+                                <option value="Отопление">Отопление</option>
+                                <option value="Вывоз мусора">Вывоз мусора</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Сумма платежа (₽) <span class="required">*</span></label>
+                            <input type="number" id="utilPayAmount" placeholder="Введите сумму" style="width:100%;padding:10px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);">
+                        </div>
+                        <button class="btn btn-success" style="width:100%;padding:12px;justify-content:center;" onclick="payUtilityNew()"><i class="fas fa-check"></i> Оплатить</button>
+                    </div>
+                    <div class="toolbar" style="margin-top:16px;">
+                        <button class="btn btn-primary btn-sm" onclick="printTable('utilityPaymentsBody', 'Коммунальные_платежи')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('utilityPaymentsBody', 'Коммунальные_платежи')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№</th><th>Плательщик</th><th>Услуга</th><th>Сумма</th><th>Дата</th><th>Статус</th></tr></thead>
+                            <tbody id="utilityPaymentsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Операции с картой -->
+            <div class="tab-content" id="front-cards">
+                <div class="sub-tabs-grid">
+                    <button class="sub-tab-btn active" data-subtab="cards-balance"><i class="fas fa-wallet"></i> Запрос баланса</button>
+                    <button class="sub-tab-btn" data-subtab="cards-withdraw"><i class="fas fa-hand-holding-usd"></i> Снятие наличных</button>
+                    <button class="sub-tab-btn" data-subtab="cards-deposit"><i class="fas fa-arrow-down"></i> Зачисление наличных</button>
+                </div>
+                
+                <!-- Баланс -->
+                <div class="sub-tab-content active" id="cards-balance">
+                    <div class="card-form">
+                        <div class="form-group"><label>Номер карты</label><input type="text" id="balanceCard" placeholder="0000 0000 0000 0000" value="1234 5678 9012 3456"></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Срок действия</label><input type="text" id="balanceExpiry" placeholder="MM/ГГ" value="12/26"></div>
+                            <div class="form-group"><label>CVV</label><input type="password" id="balanceCvv" placeholder="***" value="123" maxlength="3"></div>
+                        </div>
+                        <button class="btn btn-primary" style="width:100%;padding:12px;justify-content:center;" onclick="checkBalance()"><i class="fas fa-search"></i> Проверить баланс</button>
+                        <div id="balanceResult" class="result-box" style="display:none;"></div>
+                    </div>
+                </div>
+                
+                <!-- Снятие наличных -->
+                <div class="sub-tab-content" id="cards-withdraw">
+                    <div class="card-form">
+                        <div class="form-group"><label>Номер карты</label><input type="text" id="withdrawCard" placeholder="0000 0000 0000 0000" value="1234 5678 9012 3456"></div>
+                        <div class="form-group"><label>Сумма снятия (₽)</label><input type="number" id="withdrawAmount" placeholder="Введите сумму" value="5000"></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>ФИО получателя</label><input type="text" id="withdrawName" placeholder="Иванов И.И." value="Иванов Иван Иванович"></div>
+                            <div class="form-group"><label>Паспорт</label><input type="text" id="withdrawPassport" placeholder="Серия и номер" value="12 34 567890"></div>
+                        </div>
+                        <button class="btn btn-danger" style="width:100%;padding:12px;justify-content:center;" onclick="processWithdraw()"><i class="fas fa-money-bill-wave"></i> Снять наличные</button>
+                        <div id="withdrawResult" class="result-box" style="display:none;"></div>
+                    </div>
+                    <div class="toolbar" style="margin-top:16px;">
+                        <button class="btn btn-primary btn-sm" onclick="printTable('withdrawHistoryBody', 'Снятие_наличных')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('withdrawHistoryBody', 'Снятие_наличных')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№</th><th>Клиент</th><th>Сумма</th><th>Дата</th><th>Статус</th></tr></thead>
+                            <tbody id="withdrawHistoryBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Зачисление наличных -->
+                <div class="sub-tab-content" id="cards-deposit">
+                    <div class="card-form">
+                        <div class="form-group"><label>Номер карты</label><input type="text" id="depositCard" placeholder="0000 0000 0000 0000" value="1234 5678 9012 3456"></div>
+                        <div class="form-group"><label>Сумма зачисления (₽)</label><input type="number" id="depositAmount" placeholder="Введите сумму" value="10000"></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>ФИО вносителя</label><input type="text" id="depositName" placeholder="Иванов И.И." value="Иванов Иван Иванович"></div>
+                            <div class="form-group"><label>Способ оплаты</label>
+                                <select id="depositMethod">
+                                    <option value="Наличные">Наличные</option>
+                                    <option value="Безналичный">Безналичный</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" style="width:100%;padding:12px;justify-content:center;" onclick="processDeposit()"><i class="fas fa-arrow-down"></i> Зачислить наличные</button>
+                        <div id="depositResult" class="result-box" style="display:none;"></div>
+                    </div>
+                    <div class="toolbar" style="margin-top:16px;">
+                        <button class="btn btn-primary btn-sm" onclick="printTable('depositHistoryBody', 'Зачисление_наличных')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('depositHistoryBody', 'Зачисление_наличных')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№</th><th>Клиент</th><th>Сумма</th><th>Дата</th><th>Статус</th></tr></thead>
+                            <tbody id="depositHistoryBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- СТРАНИЦА: ОБРАТНАЯ СВЯЗЬ -->
-        <div class="page-section" id="page-support">
-            <div style="text-align:center;margin-bottom:24px;">
-                <h2 style="color:var(--primary);font-size:28px;"><i class="fas fa-headset" style="color:var(--accent);"></i> Обратная связь</h2>
-                <p style="color:var(--gray-500);">Сообщите о проблеме, задайте вопрос или предложите улучшение.</p>
+    <!-- СТРАНИЦА: БЭК-ЗОНА -->
+    <div class="page-section" id="page-back">
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="back-incoming"><i class="fas fa-inbox"></i> Входящая почта</button>
+                <button class="tab-btn" data-tab="back-outgoing"><i class="fas fa-outdent"></i> Исходящая почта</button>
+                <button class="tab-btn" data-tab="back-delivery"><i class="fas fa-truck"></i> Доставка почты</button>
+                <button class="tab-btn" data-tab="back-storage"><i class="fas fa-archive"></i> Хранение РПО</button>
             </div>
-            <div class="feedback-simple">
-                <form id="feedbackForm" action="https://formspree.io/f/xjyvvgbp" method="POST" onsubmit="return submitFeedback(event)">
-    <div class="form-group"><label><i class="fas fa-user"></i> Ваше имя</label><input type="text" id="fbName" name="name" placeholder="Иванов Иван Иванович" required></div>
-    <div class="form-group"><label><i class="fas fa-envelope"></i> Email</label><input type="email" id="fbEmail" name="_replyto" placeholder="your@email.com" required></div>
-    <div class="form-group"><label><i class="fas fa-tag"></i> Тема</label><input type="text" id="fbSubject" name="subject" placeholder="Тема сообщения" required></div>
-    <div class="form-group"><label><i class="fas fa-comment"></i> Сообщение</label><textarea id="fbMessage" name="message" placeholder="Подробно опишите проблему..." required></textarea></div>
-    
-    <!-- Скрытые поля для улучшения доставляемости -->
-    <input type="hidden" name="_subject" value="📬 Новое сообщение из АРМ Почта России">
-    <input type="hidden" name="_captcha" value="false">
-    <input type="hidden" name="_format" value="html">
-    <input type="text" name="_gotcha" style="display:none">
-    
-    <button type="submit" class="btn btn-accent" style="width:100%;padding:12px;justify-content:center;font-size:15px;"><i class="fas fa-paper-plane"></i> Отправить сообщение</button>
-</form>
-                <div class="feedback-success-box" id="feedbackSuccess">
-                    <i class="fas fa-check-circle"></i>
-                    <h4>Сообщение отправлено!</h4>
-                    <p>Спасибо за обратную связь. Мы свяжемся с вами в ближайшее время.</p>
+
+            <!-- Входящая почта -->
+            <div class="tab-content active" id="back-incoming">
+                <div class="sub-tabs-grid">
+                    <button class="sub-tab-btn active" data-subtab="incoming-receive"><i class="fas fa-arrow-down"></i> Приём входящей почты</button>
+                    <button class="sub-tab-btn" data-subtab="incoming-search"><i class="fas fa-print"></i> Поиск и печать документов</button>
+                </div>
+                
+                <!-- Приём входящей почты -->
+                <div class="sub-tab-content active" id="incoming-receive">
+                    <div class="toolbar">
+                        <button class="btn btn-success btn-sm" onclick="openModal('incomingModal')"><i class="fas fa-plus"></i> Зафиксировать прибытие</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('incomingBody', 'Входящая_почта')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('incomingBody', 'Входящая_почта')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>Трек</th><th>Отправитель</th><th>Дата прибытия</th><th>Тип</th><th>Статус</th><th>Обработка</th></tr></thead>
+                            <tbody id="incomingBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Поиск и печать документов -->
+                <div class="sub-tab-content" id="incoming-search">
+                    <div class="toolbar">
+                        <input type="date" id="docSearchFrom">
+                        <input type="date" id="docSearchTo">
+                        <input type="text" id="docSearchNumber" placeholder="🔍 № документа..." style="width:180px;">
+                        <button class="btn btn-primary btn-sm" onclick="searchDocuments()"><i class="fas fa-search"></i> Найти</button>
+                        <button class="btn btn-accent btn-sm" onclick="printDocument()"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('documentsBody', 'Документы')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№ документа</th><th>Тип</th><th>Отправитель</th><th>Дата</th><th>Действия</th></tr></thead>
+                            <tbody id="documentsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Исходящая почта -->
+            <div class="tab-content" id="back-outgoing">
+                <div class="sub-tabs-grid">
+                    <button class="sub-tab-btn active" data-subtab="outgoing-capacity"><i class="fas fa-boxes"></i> Создание емкостей</button>
+                    <button class="sub-tab-btn" data-subtab="outgoing-invoice"><i class="fas fa-file-invoice"></i> Создание накладных</button>
+                    <button class="sub-tab-btn" data-subtab="outgoing-driver"><i class="fas fa-user-check"></i> Передача почты водителю</button>
+                </div>
+                
+                <!-- Создание емкостей -->
+                <div class="sub-tab-content active" id="outgoing-capacity">
+                    <div class="toolbar">
+                        <button class="btn btn-success btn-sm" onclick="openModal('capacityModal')"><i class="fas fa-plus"></i> Создать емкость</button>
+                        <button class="btn btn-primary btn-sm" onclick="openModal('capacityEditModal')"><i class="fas fa-edit"></i> Редактировать</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('capacityTableBody', 'Емкости')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('capacityTableBody', 'Емкости')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="capacity-grid" id="capacityGrid"></div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>Емкость</th><th>Вложенные отправления</th><th>Вес</th><th>Статус</th><th>Действия</th></tr></thead>
+                            <tbody id="capacityTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Создание накладных -->
+                <div class="sub-tab-content" id="outgoing-invoice">
+                    <div class="toolbar">
+                        <button class="btn btn-success btn-sm" onclick="openModal('invoiceF23Modal')"><i class="fas fa-plus"></i> Накладная Ф23</button>
+                        <button class="btn btn-accent btn-sm" onclick="openModal('invoiceF23aModal')"><i class="fas fa-plus"></i> Накладная Ф23-а</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('invoiceTableBody', 'Накладные')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('invoiceTableBody', 'Накладные')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№ накладной</th><th>Тип</th><th>Создал</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead>
+                            <tbody id="invoiceTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Передача почты водителю -->
+                <div class="sub-tab-content" id="outgoing-driver">
+                    <div class="toolbar">
+                        <button class="btn btn-success btn-sm" onclick="openModal('driverTransferModal')"><i class="fas fa-check"></i> Передать почту</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('driverTableBody', 'Передача_почты')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('driverTableBody', 'Передача_почты')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>Водитель</th><th>Транспорт</th><th>Емкостей</th><th>Накладные</th><th>Статус</th><th>Действия</th></tr></thead>
+                            <tbody id="driverTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Доставка почты -->
+            <div class="tab-content" id="back-delivery">
+                <div class="sub-tabs-grid">
+                    <button class="sub-tab-btn active" data-subtab="delivery-postman"><i class="fas fa-walking"></i> Задание почтальона</button>
+                </div>
+                <div class="sub-tab-content active" id="delivery-postman">
+                    <div class="toolbar"><button class="btn btn-success btn-sm" onclick="openModal('postmanTaskModal')"><i class="fas fa-plus"></i> Создать задание</button></div>
+                    <div id="postmanTasksContainer"></div>
+                </div>
+            </div>
+
+            <!-- Хранение РПО -->
+            <div class="tab-content" id="back-storage">
+                <div class="sub-tabs-grid">
+                    <button class="sub-tab-btn active" data-subtab="storage-journal"><i class="fas fa-book"></i> Журнал РПО</button>
+                    <button class="sub-tab-btn" data-subtab="storage-address"><i class="fas fa-map-pin"></i> Места адресного хранения</button>
+                    <button class="sub-tab-btn" data-subtab="storage-return"><i class="fas fa-undo"></i> Отправление к возврату и досылу</button>
+                </div>
+                
+                <!-- Журнал РПО -->
+                <div class="sub-tab-content active" id="storage-journal">
+                    <div class="search-form">
+                        <div class="form-row">
+                            <div class="form-group"><label>ШИ/ШПИ/ГИ отправления</label><input type="text" id="searchTrack" placeholder="Введите ШИ, ШПИ или ГИ..." value="TRK-2026-001"></div>
+                            <div class="form-group"><label>Получатель / Отправитель</label><input type="text" id="searchPerson" placeholder="ФИО..." value="Петров П.П."></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Дата операции (от)</label><input type="date" id="searchDateFrom" value="2026-06-01"></div>
+                            <div class="form-group"><label>Дата операции (до)</label><input type="date" id="searchDateTo" value="2026-06-30"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Статус отправления</label>
+                            <select id="searchStatus">
+                                <option value="all">Все статусы</option>
+                                <option value="Принято">Принято</option>
+                                <option value="Сортировка">Сортировка</option>
+                                <option value="В пути">В пути</option>
+                                <option value="Вручено">Вручено</option>
+                                <option value="Задерживается">Задерживается</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" style="width:100%;padding:12px;justify-content:center;" onclick="searchParcel()"><i class="fas fa-search"></i> Найти отправление</button>
+                        <div id="searchResult" class="search-result"></div>
+                    </div>
+                    <div class="toolbar">
+                        <button class="btn btn-primary btn-sm" onclick="printTable('storageJournalBody', 'Журнал_РПО')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('storageJournalBody', 'Журнал_РПО')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>Трек</th><th>Получатель</th><th>Отправитель</th><th>Дата операции</th><th>Статус</th></tr></thead>
+                            <tbody id="storageJournalBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Места адресного хранения -->
+                <div class="sub-tab-content" id="storage-address">
+                    <div class="card-3d-wrapper" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));">
+                        <div class="card-3d info" data-tilt>
+                            <div class="card-glow"></div>
+                            <div class="card-icon"><i class="fas fa-map-pin"></i></div>
+                            <div>
+                                <div class="card-label">Зона А</div>
+                                <div class="card-value" id="zoneA" style="font-size:22px;">0</div>
+                            </div>
+                            <div class="card-footer-text">Ячеек занято</div>
+                        </div>
+                        <div class="card-3d success" data-tilt>
+                            <div class="card-glow"></div>
+                            <div class="card-icon"><i class="fas fa-map-pin"></i></div>
+                            <div>
+                                <div class="card-label">Зона Б</div>
+                                <div class="card-value" id="zoneB" style="font-size:22px;">0</div>
+                            </div>
+                            <div class="card-footer-text">Ячеек занято</div>
+                        </div>
+                        <div class="card-3d warning" data-tilt>
+                            <div class="card-glow"></div>
+                            <div class="card-icon"><i class="fas fa-map-pin"></i></div>
+                            <div>
+                                <div class="card-label">Зона В</div>
+                                <div class="card-value" id="zoneC" style="font-size:22px;">0</div>
+                            </div>
+                            <div class="card-footer-text">Ячеек занято</div>
+                        </div>
+                        <div class="card-3d accent" data-tilt>
+                            <div class="card-glow"></div>
+                            <div class="card-icon"><i class="fas fa-map-pin"></i></div>
+                            <div>
+                                <div class="card-label">Зона Г</div>
+                                <div class="card-value" id="zoneD" style="font-size:22px;">0</div>
+                            </div>
+                            <div class="card-footer-text">Ячеек занято</div>
+                        </div>
+                    </div>
+                    <div class="toolbar">
+                        <button class="btn btn-primary btn-sm" onclick="printTable('addressStorageBody', 'Адресное_хранение')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('addressStorageBody', 'Адресное_хранение')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>Ячейка</th><th>Трек</th><th>Получатель</th><th>Срок хранения</th><th>Статус</th></tr></thead>
+                            <tbody id="addressStorageBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Возврат и досыл -->
+                <div class="sub-tab-content" id="storage-return">
+                    <div class="toolbar">
+                        <button class="btn btn-success btn-sm" onclick="openModal('returnModal')"><i class="fas fa-undo"></i> На возврат</button>
+                        <button class="btn btn-accent btn-sm" onclick="openModal('forwardModal')"><i class="fas fa-forward"></i> На досыл</button>
+                        <button class="btn btn-primary btn-sm" onclick="printTable('returnForwardBody', 'Возврат_и_досыл')"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportTableToExcel('returnForwardBody', 'Возврат_и_досыл')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <span class="spacer"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>Трек</th><th>Отправитель</th><th>Получатель</th><th>Операция</th><th>Действия</th></tr></thead>
+                            <tbody id="returnForwardBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ======= КОРЗИНА ======= -->
-    <button class="cart-toggle-btn" onclick="toggleCart()" id="cartToggle">
-        <i class="fas fa-shopping-cart"></i>
-        <span class="cart-badge" id="cartBadge">0</span>
-    </button>
-    <div class="cart-sidebar" id="cartSidebar">
-        <div class="cart-header">
-            <h3><i class="fas fa-shopping-cart"></i> Корзина</h3>
-            <button class="close-cart" onclick="toggleCart()"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="cart-body" id="cartBody"><p style="color:var(--gray-500);text-align:center;padding:40px 0;">Корзина пуста</p></div>
-        <div class="cart-footer">
-            <div class="cart-total"><span>Итого:</span><span id="cartTotal">0 ₽</span></div>
-            <button class="btn btn-success" onclick="checkoutCart()"><i class="fas fa-check"></i> Оформить покупку</button>
-            <button class="btn btn-danger" style="margin-top:8px;" onclick="clearCart()"><i class="fas fa-trash"></i> Очистить корзину</button>
+    <!-- СТРАНИЦА: ОТЧЁТЫ -->
+    <div class="page-section active" id="page-reports">
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="reports-cash"><i class="fas fa-cash-register"></i> Кассовые отчёты</button>
+                <button class="tab-btn" data-tab="reports-general"><i class="fas fa-chart-bar"></i> Общие отчёты</button>
+                <button class="tab-btn" data-tab="reports-postal"><i class="fas fa-envelope"></i> По почтовым услугам</button>
+                <button class="tab-btn" data-tab="reports-goods"><i class="fas fa-boxes"></i> По товарам</button>
+            </div>
+
+            <!-- Кассовые отчёты -->
+            <div class="tab-content active" id="reports-cash">
+                <div class="sub-tabs-grid">
+                    <button class="sub-tab-btn active" data-subtab="cash-money"><i class="fas fa-money-bill-wave"></i> Наличные деньги в кассе</button>
+                    <button class="sub-tab-btn" data-subtab="cash-spravka"><i class="fas fa-file-alt"></i> Кассовая справка МС-42</button>
+                </div>
+                
+                <!-- Наличные деньги в кассе -->
+                <div class="sub-tab-content active" id="cash-money">
+                    <div class="card-3d-wrapper">
+                        <div class="card-3d success" data-tilt>
+                            <div class="card-glow"></div>
+                            <div class="card-icon"><i class="fas fa-cash-register"></i></div>
+                            <div>
+                                <div class="card-label">Касса №1</div>
+                                <div class="card-value" id="cash1">0 ₽</div>
+                            </div>
+                            <div class="card-footer-text">Остаток на конец дня</div>
+                        </div>
+                        <div class="card-3d primary" data-tilt>
+                            <div class="card-glow"></div>
+                            <div class="card-icon"><i class="fas fa-cash-register"></i></div>
+                            <div>
+                                <div class="card-label">Касса №2</div>
+                                <div class="card-value" id="cash2">0 ₽</div>
+                            </div>
+                            <div class="card-footer-text">Остаток на конец дня</div>
+                        </div>
+                        <div class="card-3d accent" data-tilt>
+                            <div class="card-glow"></div>
+                            <div class="card-icon"><i class="fas fa-coins"></i></div>
+                            <div>
+                                <div class="card-label">Общая выручка</div>
+                                <div class="card-value" id="cashTotal">0 ₽</div>
+                            </div>
+                            <div class="card-footer-text">За всё время</div>
+                        </div>
+                        <div class="card-3d info" data-tilt>
+                            <div class="card-glow"></div>
+                            <div class="card-icon"><i class="fas fa-receipt"></i></div>
+                            <div>
+                                <div class="card-label">Операций за день</div>
+                                <div class="card-value" id="cashOperations" style="font-size:26px;">0</div>
+                            </div>
+                            <div class="card-footer-text">Всего транзакций</div>
+                        </div>
+                    </div>
+                    <div class="toolbar">
+                        <button class="btn btn-primary btn-sm" onclick="printCashReport()"><i class="fas fa-print"></i> Печать</button>
+                        <button class="btn btn-accent btn-sm" onclick="exportExcelCash()"><i class="fas fa-file-excel"></i> Excel</button>
+                        <button class="btn btn-info btn-sm" onclick="exportWordCash()"><i class="fas fa-file-word"></i> Word</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>№</th><th>Оператор</th><th>Приход</th><th>Расход</th><th>Дата</th><th>Статус</th></tr></thead>
+                            <tbody id="cashReportBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="cashReportResult" style="margin-top:16px;padding:16px;background:var(--gray-50);border-radius:var(--radius-sm);display:none;"></div>
+                </div>
+                
+                <!-- Кассовая справка МС-42 -->
+                <div class="sub-tab-content" id="cash-spravka">
+                    <div class="toolbar">
+                        <button class="btn btn-primary btn-sm" onclick="generateMC42()"><i class="fas fa-file-alt"></i> Сформировать МС-42</button>
+                        <button class="btn btn-accent btn-sm" onclick="printMC42()"><i class="fas fa-print"></i> Печать</button>
+                        <span class="spacer"></span>
+                        <input type="date" id="mc42Date" value="2026-06-20" style="width:180px;">
+                    </div>
+                    <div id="mc42Result">
+                        <div class="card">
+                            <div class="card-header"><h3><i class="fas fa-file-alt"></i> Кассовая справка МС-42</h3></div>
+                            <div class="card-body">
+                                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+                                    <div style="background:var(--gray-50);padding:16px;border-radius:var(--radius-sm);text-align:center;">
+                                        <div style="font-size:11px;color:var(--gray-500);">Остаток на начало</div>
+                                        <div style="font-size:22px;font-weight:700;color:var(--primary);" id="mc42Start">0 ₽</div>
+                                    </div>
+                                    <div style="background:var(--gray-50);padding:16px;border-radius:var(--radius-sm);text-align:center;">
+                                        <div style="font-size:11px;color:var(--gray-500);">Приход</div>
+                                        <div style="font-size:22px;font-weight:700;color:var(--success);" id="mc42Income">0 ₽</div>
+                                    </div>
+                                    <div style="background:var(--gray-50);padding:16px;border-radius:var(--radius-sm);text-align:center;">
+                                        <div style="font-size:11px;color:var(--gray-500);">Остаток на конец</div>
+                                        <div style="font-size:22px;font-weight:700;color:var(--accent);" id="mc42End">0 ₽</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top:16px;padding:16px;background:var(--gray-100);border-radius:var(--radius-sm);font-size:13px;">
+                                    <p><strong>Документ:</strong> Кассовая справка МС-42 №124 от <span id="mc42DateDisplay">2026-06-20</span></p>
+                                    <p><strong>Смена:</strong> №124 · Кассир: Иванов И.И.</p>
+                                    <p><strong>Подпись:</strong> ___________________</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Общие отчёты -->
+            <div class="tab-content" id="reports-general">
+                <div class="sub-tabs-grid">
+                    <button class="sub-tab-btn active" data-subtab="general-2ap"><i class="fas fa-file-alt"></i> Отчёт ф.2а-п</button>
+                </div>
+                <div class="sub-tab-content active" id="general-2ap">
+                    <div class="toolbar">
+                        <button class="btn btn-primary btn-sm" onclick="generateReport2ap()"><i class="fas fa-file-alt"></i> Сформировать</button>
+                        <button class="btn btn-accent btn-sm" onclick="printReport2ap()"><i class="fas fa-print"></i> Печать</button>
+                        <span class="spacer"></span>
+                        <input type="date" id="report2apFrom" value="2026-06-01" style="width:160px;">
+                        <input type="date" id="report2apTo" value="2026-06-30" style="width:160px;">
+                    </div>
+                    <div id="report2apResult">
+                        <div class="card">
+                            <div class="card-header"><h3><i class="fas fa-newspaper"></i> Отчёт ф.2а-п — поступление и отправка</h3></div>
+                            <div class="card-body">
+                                <div class="card-3d-wrapper" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));">
+                                    <div class="card-3d success" data-tilt>
+                                        <div class="card-glow"></div>
+                                        <div class="card-icon"><i class="fas fa-envelope"></i></div>
+                                        <div>
+                                            <div class="card-label">Поступило писем</div>
+                                            <div class="card-value" id="report2apInLetters" style="font-size:22px;">0</div>
+                                        </div>
+                                        <div class="card-footer-text">За период</div>
+                                    </div>
+                                    <div class="card-3d accent" data-tilt>
+                                        <div class="card-glow"></div>
+                                        <div class="card-icon"><i class="fas fa-envelope-open"></i></div>
+                                        <div>
+                                            <div class="card-label">Отправлено писем</div>
+                                            <div class="card-value" id="report2apOutLetters" style="font-size:22px;">0</div>
+                                        </div>
+                                        <div class="card-footer-text">За период</div>
+                                    </div>
+                                    <div class="card-3d info" data-tilt>
+                                        <div class="card-glow"></div>
+                                        <div class="card-icon"><i class="fas fa-newspaper"></i></div>
+                                        <div>
+                                            <div class="card-label">Поступило газет</div>
+                                            <div class="card-value" id="report2apInNewspapers" style="font-size:22px;">0</div>
+                                        </div>
+                                        <div class="card-footer-text">За период</div>
+                                    </div>
+                                    <div class="card-3d emerald" data-tilt>
+                                        <div class="card-glow"></div>
+                                        <div class="card-icon"><i class="fas fa-newspaper"></i></div>
+                                        <div>
+                                            <div class="card-label">Отправлено газет</div>
+                                            <div class="card-value" id="report2apOutNewspapers" style="font-size:22px;">0</div>
+                                        </div>
+                                        <div class="card-footer-text">За период</div>
+                                    </div>
+                                    <div class="card-3d purple" data-tilt>
+                                        <div class="card-glow"></div>
+                                        <div class="card-icon"><i class="fas fa-box"></i></div>
+                                        <div>
+                                            <div class="card-label">Поступило посылок</div>
+                                            <div class="card-value" id="report2apInParcels" style="font-size:22px;">0</div>
+                                        </div>
+                                        <div class="card-footer-text">За период</div>
+                                    </div>
+                                    <div class="card-3d teal" data-tilt>
+                                        <div class="card-glow"></div>
+                                        <div class="card-icon"><i class="fas fa-box"></i></div>
+                                        <div>
+                                            <div class="card-label">Отправлено посылок</div>
+                                            <div class="card-value" id="report2apOutParcels" style="font-size:22px;">0</div>
+                                        </div>
+                                        <div class="card-footer-text">За период</div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="data-table">
+                                        <thead><tr><th>Дата</th><th>Поступило</th><th>Отправлено</th><th>Тип</th></tr></thead>
+                                        <tbody id="report2apTableBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- По почтовым услугам -->
+            <div class="tab-content" id="reports-postal">
+                <div class="sub-tabs-grid">
+                    <button class="sub-tab-btn active" data-subtab="postal-rpo"><i class="fas fa-box"></i> Отчёт по движению РПО</button>
+                    <button class="sub-tab-btn" data-subtab="postal-journal"><i class="fas fa-book"></i> Журнал операций</button>
+                </div>
+                
+                <!-- Отчёт по движению РПО -->
+                <div class="sub-tab-content active" id="postal-rpo">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;padding:12px 16px;background:var(--gray-50);border-radius:var(--radius-sm);border:1px solid var(--gray-200);">
+                        <div>
+                            <span style="font-size:13px;color:var(--gray-500);">Данные актуальны на</span>
+                            <span style="font-weight:600;font-size:14px;color:var(--primary);" id="rpoReportDate">17:14, 24.08.2026 г.</span>
+                        </div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button class="btn btn-success btn-sm" onclick="exportRPOExcel()"><i class="fas fa-file-excel"></i> Выгрузить в Excel</button>
+                            <button class="btn btn-accent btn-sm" onclick="printRPOReport()"><i class="fas fa-print"></i> Распечатать отчёт</button>
+                            <button class="btn btn-primary btn-sm" onclick="refreshRPOTable()"><i class="fas fa-sync"></i> Обновить</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive" style="margin-top:12px;">
+                        <table class="data-table" id="rpoMovementTable" style="font-size:11px;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="font-size:10px;padding:4px 6px;">Вид</th>
+                                    <th colspan="3" style="text-align:center;font-size:10px;padding:4px 6px;">Остаток на начало дня</th>
+                                    <th rowspan="2" style="font-size:10px;padding:4px 6px;">Поступило</th>
+                                    <th rowspan="2" style="font-size:10px;padding:4px 6px;">Вручено</th>
+                                    <th rowspan="2" style="font-size:10px;padding:4px 6px;">Утрачено/<br>Изъято</th>
+                                    <th rowspan="2" style="font-size:10px;padding:4px 6px;">Дослано/<br>Возвращено</th>
+                                    <th colspan="3" style="text-align:center;font-size:10px;padding:4px 6px;">Остаток на конец дня</th>
+                                </tr>
+                                <tr>
+                                    <th style="font-size:9px;padding:3px 4px;">На хранении в ОПС</th>
+                                    <th style="font-size:9px;padding:3px 4px;">В доставке</th>
+                                    <th style="font-size:9px;padding:3px 4px;">Итого</th>
+                                    <th style="font-size:9px;padding:3px 4px;">На хранении в ОПС</th>
+                                    <th style="font-size:9px;padding:3px 4px;">В доставке</th>
+                                    <th style="font-size:9px;padding:3px 4px;">Итого</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rpoMovementBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Журнал операций -->
+                <div class="sub-tab-content" id="postal-journal">
+                    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;padding:12px 16px;background:var(--gray-50);border-radius:var(--radius-sm);border:1px solid var(--gray-200);align-items:center;">
+                        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                            <input type="text" id="journalSearch" placeholder="🔍 Поиск..." style="padding:7px 12px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);font-size:13px;width:160px;">
+                            <input type="date" id="journalDateFrom" style="padding:7px 12px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);font-size:13px;width:140px;">
+                            <span style="font-size:13px;color:var(--gray-500);">—</span>
+                            <input type="date" id="journalDateTo" style="padding:7px 12px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);font-size:13px;width:140px;">
+                            <input type="text" id="journalFd" placeholder="Номер ФД" style="padding:7px 12px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);font-size:13px;width:140px;">
+                            <input type="text" id="journalCheck" placeholder="Номер чека" style="padding:7px 12px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);font-size:13px;width:140px;">
+                            <select id="journalWindow" style="padding:7px 12px;border:2px solid var(--gray-200);border-radius:var(--radius-xs);font-size:13px;">
+                                <option value="">Все окна</option>
+                                <option value="Окно 01">Окно 01</option>
+                                <option value="Окно 02">Окно 02</option>
+                                <option value="Окно 03">Окно 03</option>
+                            </select>
+                            <button class="btn btn-primary btn-sm" onclick="filterJournal()"><i class="fas fa-filter"></i> Отфильтровать</button>
+                            <button class="btn btn-outline btn-sm" onclick="resetJournalFilters()"><i class="fas fa-undo"></i> Сбросить</button>
+                        </div>
+                        <div style="display:flex;gap:6px;margin-left:auto;">
+                            <button class="btn btn-success btn-sm" onclick="exportJournalExcel()"><i class="fas fa-file-excel"></i> Excel</button>
+                            <button class="btn btn-accent btn-sm" onclick="printJournal()"><i class="fas fa-print"></i> Печать</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table" id="journalTable">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Время</th>
+                                    <th>Номер окна</th>
+                                    <th>Пользователь</th>
+                                    <th>Номер чека</th>
+                                    <th>Номер ФД</th>
+                                    <th>Сумма (₽)</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody id="journalBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- По товарам -->
+            <div class="tab-content" id="reports-goods">
+                <div class="sub-tabs-grid">
+                    <button class="sub-tab-btn active" data-subtab="goods-movement"><i class="fas fa-arrow-right"></i> Отчёт по движению ТМЦ</button>
+                </div>
+                <div class="sub-tab-content active" id="goods-movement">
+                    <div class="toolbar">
+                        <button class="btn btn-primary btn-sm" onclick="generateGoodsReport()"><i class="fas fa-file-alt"></i> Сформировать</button>
+                        <button class="btn btn-accent btn-sm" onclick="printGoodsReport()"><i class="fas fa-print"></i> Печать</button>
+                        <span class="spacer"></span>
+                        <input type="date" id="goodsReportFrom" value="2026-06-01" style="width:160px;">
+                        <input type="date" id="goodsReportTo" value="2026-06-30" style="width:160px;">
+                    </div>
+                    <div id="goodsReportResult">
+                        <div class="report-cards">
+                            <div class="report-card"><i class="fas fa-box"></i><h4>Остаток на начало</h4><p id="goodsStartBalance">0 шт.</p></div>
+                            <div class="report-card" style="border-color:var(--success);"><i class="fas fa-arrow-down" style="color:var(--success);"></i><h4>Поступило</h4><p id="goodsIncome">0 шт.</p></div>
+                            <div class="report-card" style="border-color:var(--danger);"><i class="fas fa-arrow-up" style="color:var(--danger);"></i><h4>Продано</h4><p id="goodsOutcome">0 шт.</p></div>
+                            <div class="report-card" style="border-color:var(--accent);"><i class="fas fa-boxes" style="color:var(--accent);"></i><h4>Остаток на конец</h4><p id="goodsEndBalance">0 шт.</p></div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead><tr><th>Артикул</th><th>Наименование</th><th>Приход</th><th>Расход</th><th>Остаток</th></tr></thead>
+                                <tbody id="goodsReportTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- ======= КОНТЕЙНЕР ДЛЯ ТОСТОВ ======= -->
-    <div class="toast-container" id="toastContainer"></div>
+    <!-- СТРАНИЦА: СЛУЖЕБНЫЕ ОПЕРАЦИИ -->
+    <div class="page-section" id="page-service">
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="service-cash"><i class="fas fa-cash-register"></i> Кассовые операции</button>
+            </div>
+            <div class="tab-content active" id="service-cash">
+                <div class="card-3d-wrapper">
+                    <div class="card-3d emerald" data-tilt>
+                        <div class="card-glow"></div>
+                        <div class="card-icon"><i class="fas fa-cash-register"></i></div>
+                        <div>
+                            <div class="card-label">Касса №1</div>
+                            <div class="card-value" id="serviceCash1">0 ₽</div>
+                        </div>
+                        <div class="card-footer-text">Текущий остаток</div>
+                    </div>
+                    <div class="card-3d cyan" data-tilt>
+                        <div class="card-glow"></div>
+                        <div class="card-icon"><i class="fas fa-cash-register"></i></div>
+                        <div>
+                            <div class="card-label">Касса №2</div>
+                            <div class="card-value" id="serviceCash2">0 ₽</div>
+                        </div>
+                        <div class="card-footer-text">Текущий остаток</div>
+                    </div>
+                    <div class="card-3d amber" data-tilt>
+                        <div class="card-glow"></div>
+                        <div class="card-icon"><i class="fas fa-clock"></i></div>
+                        <div>
+                            <div class="card-label">Смена №</div>
+                            <div class="card-value" id="serviceShift" style="font-size:26px;">#0</div>
+                        </div>
+                        <div class="card-footer-text">Текущая смена</div>
+                    </div>
+                    <div class="card-3d rose" data-tilt>
+                        <div class="card-glow"></div>
+                        <div class="card-icon"><i class="fas fa-info-circle"></i></div>
+                        <div>
+                            <div class="card-label">Статус</div>
+                            <div class="card-value" id="serviceStatus" style="font-size:20px;">Закрыта</div>
+                        </div>
+                        <div class="card-footer-text">Состояние кассы</div>
+                    </div>
+                </div>
+                <div class="toolbar">
+                    <button class="btn btn-success btn-sm" onclick="openShift()"><i class="fas fa-play"></i> Открыть смену</button>
+                    <button class="btn btn-danger btn-sm" onclick="closeShift()"><i class="fas fa-stop"></i> Закрыть смену</button>
+                    <button class="btn btn-accent btn-sm" onclick="processCollection()"><i class="fas fa-cash-register"></i> Инкассация</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead><tr><th>№</th><th>Оператор</th><th>Приход</th><th>Расход</th><th>Дата</th><th>Статус</th></tr></thead>
+                        <tbody id="serviceCashBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СТРАНИЦА: ОБРАТНАЯ СВЯЗЬ -->
+    <div class="page-section" id="page-support">
+        <div style="text-align:center;margin-bottom:24px;">
+            <h2 style="color:var(--primary);font-size:28px;"><i class="fas fa-headset" style="color:var(--accent);"></i> Обратная связь</h2>
+            <p style="color:var(--gray-500);">Сообщите о проблеме, задайте вопрос или предложите улучшение.</p>
+        </div>
+        <div class="feedback-simple">
+            <form id="feedbackForm" action="https://formspree.io/f/xjyvvgbp" method="POST" onsubmit="return submitFeedback(event)">
+                <div class="form-group"><label><i class="fas fa-user"></i> Ваше имя</label><input type="text" id="fbName" name="name" placeholder="Иванов Иван Иванович" required></div>
+                <div class="form-group"><label><i class="fas fa-envelope"></i> Email</label><input type="email" id="fbEmail" name="_replyto" placeholder="your@email.com" required></div>
+                <div class="form-group"><label><i class="fas fa-tag"></i> Тема</label><input type="text" id="fbSubject" name="subject" placeholder="Тема сообщения" required></div>
+                <div class="form-group"><label><i class="fas fa-comment"></i> Сообщение</label><textarea id="fbMessage" name="message" placeholder="Подробно опишите проблему..." required></textarea></div>
+                <input type="hidden" name="_subject" value="Новое сообщение из АРМ Почта России">
+                <input type="hidden" name="_captcha" value="false">
+                <button type="submit" class="btn btn-accent" style="width:100%;padding:12px;justify-content:center;font-size:15px;"><i class="fas fa-paper-plane"></i> Отправить сообщение</button>
+            </form>
+            <div class="feedback-success-box" id="feedbackSuccess">
+                <i class="fas fa-check-circle"></i>
+                <h4>Сообщение отправлено!</h4>
+                <p>Спасибо за обратную связь. Мы свяжемся с вами в ближайшее время.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======= КОРЗИНА ======= -->
+ <!-- ======= КНОПКА ПЕРЕКЛЮЧЕНИЯ ТЕМЫ ======= -->
+<button class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggle" title="Переключить тему">
+    <i class="fas fa-moon"></i>
+</button>
+<button class="cart-toggle-btn" onclick="toggleCart()" id="cartToggle">
+    <i class="fas fa-shopping-cart"></i>
+    <span class="cart-badge" id="cartBadge">0</span>
+</button>
+<div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+        <h3><i class="fas fa-shopping-cart"></i> Корзина</h3>
+        <button class="close-cart" onclick="toggleCart()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="cart-body" id="cartBody"><p style="color:var(--gray-500);text-align:center;padding:40px 0;">Корзина пуста</p></div>
+    <div class="cart-footer">
+        <div class="cart-total"><span>Итого:</span><span id="cartTotal">0 ₽</span></div>
+        <button class="btn btn-success" onclick="checkoutCart()"><i class="fas fa-check"></i> Оформить покупку</button>
+        <button class="btn btn-danger" style="margin-top:8px;" onclick="clearCart()"><i class="fas fa-trash"></i> Очистить корзину</button>
+    </div>
+</div>
+
+<!-- ======= КОНТЕЙНЕР ДЛЯ ТОСТОВ ======= -->
+<div class="toast-container" id="toastContainer"></div>
 
     <!-- ================================================================ -->
     <!-- МОДАЛЬНЫЕ ОКНА -->
