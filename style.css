@@ -1,6 +1,253 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
+
+            /* ======= ТЁМНАЯ ТЕМА ======= */
+body.dark-mode {
+    --gray-50: #0f172a;
+    --gray-100: #1e293b;
+    --gray-200: #334155;
+    --gray-300: #475569;
+    --gray-400: #64748b;
+    --gray-500: #94a3b8;
+    --gray-600: #cbd5e1;
+    --gray-700: #e2e8f0;
+    --gray-800: #f1f5f9;
+    --gray-900: #f8fafc;
+    background: #0f172a;
+    color: #f1f5f9;
+}
+
+body.dark-mode .card,
+body.dark-mode .card-3d,
+body.dark-mode .tabs-container,
+body.dark-mode .toolbar,
+body.dark-mode .stat-card,
+body.dark-mode .feedback-simple,
+body.dark-mode .modal-window,
+body.dark-mode .cart-sidebar {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.dark-mode .card-3d {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;
+}
+
+body.dark-mode .card-3d.primary { background: linear-gradient(135deg, #0f172a 0%, #1a3a6b 100%) !important; }
+body.dark-mode .card-3d.success { background: linear-gradient(135deg, #0f172a 0%, #065f46 100%) !important; }
+body.dark-mode .card-3d.accent { background: linear-gradient(135deg, #0f172a 0%, #5d3a1a 100%) !important; }
+body.dark-mode .card-3d.info { background: linear-gradient(135deg, #0f172a 0%, #1a3a6b 100%) !important; }
+body.dark-mode .card-3d.emerald { background: linear-gradient(135deg, #0f172a 0%, #065f46 100%) !important; }
+body.dark-mode .card-3d.cyan { background: linear-gradient(135deg, #0f172a 0%, #1a5b5b 100%) !important; }
+body.dark-mode .card-3d.amber { background: linear-gradient(135deg, #0f172a 0%, #5b4a1a 100%) !important; }
+body.dark-mode .card-3d.rose { background: linear-gradient(135deg, #0f172a 0%, #6b1a1a 100%) !important; }
+body.dark-mode .card-3d.purple { background: linear-gradient(135deg, #0f172a 0%, #3b1a6b 100%) !important; }
+body.dark-mode .card-3d.teal { background: linear-gradient(135deg, #0f172a 0%, #1a5b5b 100%) !important; }
+body.dark-mode .card-3d.warning { background: linear-gradient(135deg, #0f172a 0%, #5b4a1a 100%) !important; }
+
+body.dark-mode .stat-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.dark-mode table.data-table thead { background: #334155; }
+body.dark-mode table.data-table th { color: #94a3b8; }
+body.dark-mode table.data-table td { border-color: #334155; }
+body.dark-mode table.data-table tr:hover td { background: #2d3748; }
+
+body.dark-mode .modal-window {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+body.dark-mode .modal-window h3,
+body.dark-mode .modal-window .modal-sub {
+    color: #f1f5f9;
+}
+
+body.dark-mode .form-group label {
+    color: #94a3b8;
+}
+
+body.dark-mode .form-group input,
+body.dark-mode .form-group select,
+body.dark-mode .form-group textarea {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.dark-mode .form-group input:focus,
+body.dark-mode .form-group select:focus,
+body.dark-mode .form-group textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(240,180,41,0.15);
+}
+
+body.dark-mode .badge-success { background: #065f46; color: #34d399; }
+body.dark-mode .badge-warning { background: #5b4a1a; color: #fbbf24; }
+body.dark-mode .badge-danger { background: #6b1a1a; color: #f87171; }
+body.dark-mode .badge-info { background: #1a3a6b; color: #60a5fa; }
+
+body.dark-mode .report-card {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.dark-mode .delivery-task-card {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.dark-mode .capacity-item {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.dark-mode .shift-report {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark-mode .search-form {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark-mode .search-form .form-group label {
+    color: #94a3b8;
+}
+
+body.dark-mode .search-form .form-group input,
+body.dark-mode .search-form .form-group select {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.dark-mode .filter-buttons {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark-mode .filter-buttons .filter-btn {
+    background: #0f172a;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+body.dark-mode .filter-buttons .filter-btn.active {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+body.dark-mode .card-form {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark-mode .quick-payments .qp-btn {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+body.dark-mode .quick-payments .qp-btn:hover {
+    background: #2d3748;
+    border-color: var(--accent);
+    color: #f1f5f9;
+}
+
+body.dark-mode .lottery-actions .lottery-btn {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+body.dark-mode .lottery-actions .lottery-btn:hover {
+    background: #2d3748;
+    border-color: var(--primary);
+    color: #f1f5f9;
+}
+
+body.dark-mode .postamat-item {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.dark-mode .postamat-item:hover {
+    background: #2d3748;
+    border-color: var(--accent);
+}
+
+body.dark-mode .journal-status-completed {
+    background: #065f46;
+    color: #34d399;
+}
+
+body.dark-mode .journal-status-pending {
+    background: #5b4a1a;
+    color: #fbbf24;
+}
+
+body.dark-mode .total-row {
+    background: #2d3748 !important;
+}
+
+body.dark-mode .btn-outline {
+    color: #94a3b8;
+    border-color: #334155;
+}
+
+body.dark-mode .btn-outline:hover {
+    background: #2d3748;
+    border-color: #64748b;
+}
+
+body.dark-mode .cart-sidebar .cart-item {
+    border-color: #334155;
+}
+
+body.dark-mode .cart-sidebar .cart-footer {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+/* Кнопка переключения темы */
+.theme-toggle-btn {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    z-index: 9997;
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle-btn:hover {
+    transform: scale(1.1) rotate(360deg);
+    box-shadow: var(--shadow-xl);
+}
+
+body.dark-mode .theme-toggle-btn {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #0f172a;
+}
             /* Основные цвета - более современная палитра */
             --primary: #0a1628;
             --primary-light: #1a3a6b;
