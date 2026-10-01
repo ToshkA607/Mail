@@ -300,11 +300,11 @@ body.dark-mode .theme-toggle-btn {
             --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
-        body {
-            font-family: var(--font-family);
-            background: var(--gray-50);
-            color: var(--gray-800);
-            display: flex;
+body {
+    font-family: var(--font-family);
+    background: var(--gray-50);
+    color: var(--gray-800);
+    min-height: 100vh;
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -365,7 +365,7 @@ body.dark-mode .theme-toggle-btn {
 
         /* ======= АВТОРИЗАЦИЯ - СОВРЕМЕННАЯ ======= */
         #authScreen {
-            display: flex;
+            display: none;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
@@ -795,14 +795,15 @@ body.dark-mode .theme-toggle-btn {
         }
 
         /* ======= ОСНОВНОЙ КОНТЕНТ ======= */
-        #mainContent {
-            margin-left: var(--sidebar-width);
-            flex: 1;
-            padding: 24px 32px 40px;
-            min-height: 100vh;
-            display: none;
-            background: var(--gray-50);
-        }
+#mainContent {
+    margin-left: var(--sidebar-width);
+    padding: 24px 32px 40px;
+    min-height: 100vh;
+    display: none;
+    background: var(--gray-50);
+    width: calc(100% - var(--sidebar-width));
+    box-sizing: border-box;
+}
         .mobile-toggle {
             display: none;
             background: var(--primary-gradient);
@@ -818,15 +819,8 @@ body.dark-mode .theme-toggle-btn {
         }
         .mobile-toggle:hover { transform: scale(1.02); box-shadow: var(--shadow-md); }
         
-        .page-section {
-            display: none;
-            animation: pageFadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .page-section.active { display: block; }
-        @keyframes pageFadeIn {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+.page-section { display: none; }
+.page-section.active { display: block; }
 
         /* ======= ВКЛАДКИ - СОВРЕМЕННЫЕ ======= */
         .tabs-container {
@@ -887,16 +881,8 @@ body.dark-mode .theme-toggle-btn {
         .tabs-header .tab-btn i { font-size: 14px; transition: var(--transition); }
         .tabs-header .tab-btn:hover i { transform: scale(1.15) rotate(-5deg); }
         
-        .tab-content {
-            display: none;
-            padding: 24px 28px 28px;
-            animation: tabFadeIn 0.4s ease;
-        }
-        .tab-content.active { display: block; }
-        @keyframes tabFadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+.tab-content { display: none; padding: 24px 28px 28px; }
+.tab-content.active { display: block; }
 
         /* ======= ПОДВКЛАДКИ - СОВРЕМЕННЫЕ ======= */
         .sub-tabs-grid {
@@ -944,15 +930,9 @@ body.dark-mode .theme-toggle-btn {
         }
         .sub-tabs-grid .sub-tab-btn.active i { color: var(--accent); }
         
-        .sub-tab-content {
-            display: none;
-            animation: subTabFadeIn 0.4s ease;
-        }
-        .sub-tab-content.active { display: block; }
-        @keyframes subTabFadeIn {
-            from { opacity: 0; transform: translateY(8px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
+.sub-tab-content { display: none; }
+.sub-tab-content.active { display: block; }
+
 
         /* ======= КАРТОЧКИ И ТАБЛИЦЫ - СОВРЕМЕННЫЕ ======= */
         .card {
@@ -2006,4 +1986,214 @@ body.dark-mode .theme-toggle-btn {
 }
 @media (max-width: 480px) {
     .card-3d-wrapper { grid-template-columns: 1fr; }
+}
+
+/* ================================================================
+   ДОПОЛНЕНИЯ v11.0
+   ================================================================ */
+
+/* Кнопки количества в корзине */
+.cart-item-qty {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 8px;
+}
+.item-qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    padding-top: 6px;
+    border-top: 1px dashed var(--gray-200);
+}
+.qty-btn {
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-xs);
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--gray-700);
+    min-width: 32px;
+}
+.qty-btn:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: scale(1.05);
+}
+.qty-input {
+    width: 55px;
+    padding: 4px 6px;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-xs);
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    background: white;
+}
+.qty-input:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(10,22,40,0.1);
+}
+.item-qty-controls .item-remove {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: var(--radius-xs);
+    transition: var(--transition);
+}
+.item-qty-controls .item-remove:hover {
+    background: var(--danger-light);
+    transform: scale(1.1);
+}
+
+/* Панель периода экспорта */
+.export-period {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    margin-right: 8px;
+    font-size: 12px;
+}
+.export-period label {
+    color: var(--gray-500);
+    font-weight: 500;
+    margin: 0;
+}
+.export-period input[type="date"] {
+    padding: 4px 8px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-xs);
+    font-size: 12px;
+    background: white;
+    font-family: inherit;
+}
+.export-period input[type="date"]:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(10,22,40,0.08);
+}
+
+/* Ошибки валидации */
+.input-error {
+    border-color: var(--danger) !important;
+    background: #fff5f5 !important;
+    animation: shake 0.4s ease;
+}
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+.field-error {
+    color: var(--danger);
+    font-size: 11px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.field-error::before {
+    content: '⚠';
+    font-size: 12px;
+}
+
+/* Тёмная тема для новых элементов */
+body.dark-mode .qty-btn {
+    background: #334155;
+    border-color: #475569;
+    color: #cbd5e1;
+}
+body.dark-mode .qty-btn:hover {
+    background: var(--accent);
+    color: #0f172a;
+    border-color: var(--accent);
+}
+body.dark-mode .qty-input {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+body.dark-mode .export-period {
+    background: #1e293b;
+    border-color: #334155;
+}
+body.dark-mode .export-period input[type="date"] {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+body.dark-mode .input-error {
+    background: #3a1a1a !important;
+    border-color: #ef4444 !important;
+}
+body.dark-mode .field-error {
+    color: #f87171;
+}
+
+/* Статусы-бейджи с иконками */
+.badge i {
+    margin-right: 4px;
+    font-size: 10px;
+}
+
+/* Кнопки перехода статуса */
+.btn-status-next {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.btn-status-next:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59,130,246,0.4);
+}
+
+/* Модалка с ограничением смены */
+.shift-restriction {
+    background: var(--warning-light);
+    border-left: 4px solid var(--warning);
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    margin: 12px 0;
+    font-size: 13px;
+    color: #92400e;
+}
+body.dark-mode .shift-restriction {
+    background: #422006;
+    color: #fbbf24;
+}
+
+/* ================================================================
+   ИСПРАВЛЕНИЕ ТЁМНОЙ ТЕМЫ — выносим body.dark-mode ИЗ :root
+   ================================================================ */
+body.dark-mode {
+    --gray-50: #0f172a;
+    --gray-100: #1e293b;
+    --gray-200: #334155;
+    --gray-300: #475569;
+    --gray-400: #64748b;
+    --gray-500: #94a3b8;
+    --gray-600: #cbd5e1;
+    --gray-700: #e2e8f0;
+    --gray-800: #f1f5f9;
+    --gray-900: #f8fafc;
+    background: #0f172a;
+    color: #f1f5f9;
 }
