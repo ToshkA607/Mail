@@ -13,7 +13,7 @@
 ## 🚀 Демо
 
 🌐 **Деплой на GitHub Pages:**  
-[https://LATE2103.github.io/postal-arm/](https://LATE2103.github.io/postal-arm/)
+[[https://LATE2103.github.io/postal-arm/](https://LATE2103.github.io/postal-arm/)](https://toshka607.github.io/Mail/)
 
 ---
 
